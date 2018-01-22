@@ -23,10 +23,14 @@
 package net.waynepiekarski.xplanecdu
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 
 class MainActivity : Activity() {
+
+    val TAG = "XPlaneCDU"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +48,11 @@ class MainActivity : Activity() {
                             or View.SYSTEM_UI_FLAG_FULLSCREEN
                             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         }
+    }
+
+    override fun onConfigurationChanged(config: Configuration) {
+        Log.d(TAG, "onConfigurationChanged")
+        super.onConfigurationChanged(config)
     }
 
 }
