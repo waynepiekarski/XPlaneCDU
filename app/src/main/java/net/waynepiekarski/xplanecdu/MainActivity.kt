@@ -26,7 +26,9 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
 
@@ -35,6 +37,18 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        versionText.text = "v" + BuildConfig.VERSION_NAME + " " + BuildConfig.VERSION_CODE + " " + BuildConfig.BUILD_TYPE
+
+        cduImage.setOnTouchListener { _view, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_UP) {
+                // Compute touch location relative to the original image size
+                val ix = ((motionEvent.x * cduImage.getDrawable().intrinsicWidth) / cduImage.width).toInt()
+                val iy = ((motionEvent.y * cduImage.getDrawable().intrinsicHeight) / cduImage.height).toInt()
+                Log.d(TAG, "ImageClick = ${ix},${iy}, RawClick = ${motionEvent.x},${motionEvent.y} from Image ${cduImage.getDrawable().intrinsicWidth},${cduImage.getDrawable().intrinsicHeight} -> ${cduImage.width},${cduImage.height}")
+            }
+            true
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus:Boolean) {
