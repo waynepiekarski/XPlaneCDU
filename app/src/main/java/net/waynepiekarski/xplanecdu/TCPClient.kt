@@ -52,7 +52,7 @@ class TCPClient (address: InetAddress, port: Int, internal var callback: OnRecei
     }
 
     init {
-        Log.d(Const.TAG, "Created thread to listen for $address on port $port")
+        Log.d(Const.TAG, "Created thread to connect to $address on port $port")
         thread(start = true) {
             try {
                 socket = Socket(address, port)
@@ -64,6 +64,10 @@ class TCPClient (address: InetAddress, port: Int, internal var callback: OnRecei
 
                 while (!cancelled) {
                     val line = bufferedReader.readLine()
+                    if (line == null) {
+                        Log.d(Const.TAG, "readLine returned null, connection has failed")
+                        cancelled = true
+                    }
                     Log.d(Const.TAG, "TCP returned line [$line]")
                     Handler(Looper.getMainLooper()).post {
                         callback.onReceiveTCP(line)
@@ -75,6 +79,7 @@ class TCPClient (address: InetAddress, port: Int, internal var callback: OnRecei
                 Log.e(Const.TAG, "Socket failed " + e)
             } finally {
                 Log.d(Const.TAG, "Thread is cancelled, closing down TCP listener")
+                bufferedWriter.close()
                 socket.close()
                 Log.d(Const.TAG, "TCP listener thread for port $port has ended")
             }

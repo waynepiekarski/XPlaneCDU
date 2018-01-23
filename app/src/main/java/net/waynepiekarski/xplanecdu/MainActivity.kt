@@ -104,7 +104,7 @@ class MainActivity : Activity(), TCPClient.OnReceiveTCP, MulticastReceiver.OnRec
         xplane_address = source
 
         if (tcp_extplane == null) {
-            Log.d(Const.TAG, "Making connection to $xplane_address")
+            Log.d(Const.TAG, "Making connection to $xplane_address:${Const.TCP_EXTPLANE_PORT}")
             tcp_extplane = TCPClient(xplane_address!!, Const.TCP_EXTPLANE_PORT, this)
         }
     }
@@ -119,9 +119,9 @@ class MainActivity : Activity(), TCPClient.OnReceiveTCP, MulticastReceiver.OnRec
             // Make requests for CDU values on a separate thread
             thread(start = true) {
                 tcp_extplane!!.writeln("sub sim/aircraft/view/acf_descrip")
-                for (line in Definitions.CDULinesZibo737) {
-                    // Log.d(Const.TAG, "Requesting CDU text key=" + line.key + " value=" + line.value.description)
-                    tcp_extplane!!.writeln("sub " + line.key)
+                for (entry in Definitions.CDULinesZibo737) {
+                    // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
+                    tcp_extplane!!.writeln("sub " + entry.key)
                 }
             }
         } else {
@@ -134,7 +134,18 @@ class MainActivity : Activity(), TCPClient.OnReceiveTCP, MulticastReceiver.OnRec
             val tokens = line.split(" ")
             if (tokens[0] == "ub") {
                 val decoded = String(Base64.decode(tokens[2], Base64.DEFAULT))
-                Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [${decoded}]")
+                Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
+                val entry = Definitions.CDULinesZibo737.get(tokens[1])
+                if (entry == null) {
+                    Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$decoded]")
+                } else {
+                    val view = entry!!.getTextView(this)
+                    if (entry.inverse) {
+                        Log.d(Const.TAG, "Ignoring _I inverted message, not sure what [ ] means right now")
+                    } else {
+                        view.setText(decoded)
+                    }
+                }
             } else {
                 Log.e(Const.TAG, "Unknown encoding type [${tokens[0]}] for name [${tokens[1]}]")
             }

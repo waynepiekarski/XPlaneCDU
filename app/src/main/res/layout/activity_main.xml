@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/topLayout">
 
         <TextView
             android:layout_width="wrap_content"
@@ -50,7 +51,414 @@
         android:id="@+id/cduImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/topLayout"
         android:scaleType="fitXY"
         android:src="@drawable/boeing_grey" />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/topPaddingDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="#40ff0000"
+            android:text="Top Padding" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/leftPaddingDisplay"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:background="#50000080"
+                android:text="TextView" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <!-- Start row zero -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <!--
+                <TextView
+                    android:id="@+id/terminalLabel0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer0"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" /> -->
+
+                <TextView
+                    android:id="@+id/terminalTextLarge0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer0"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer0"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row one -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge0"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer1"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel1"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel1"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row two -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge1"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer2"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel2"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel2"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row three -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge2"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer3"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel3"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel3"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row four -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge3"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer4"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel4"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel4"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row five -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge4"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer5"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel5"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel5"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row six -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge5"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalLabel6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer6"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF0000FF"
+                    android:textSize="30.0sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel6"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/terminalTextSmall6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalLabel6"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="ABCDEFGHIJABCDEFGHIJABCD"
+                    android:textColor="#80FF0000"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+                <!-- Start row seven - text entry -->
+
+                <TextView
+                    android:id="@+id/terminalSpacer7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalTextLarge6"
+                    android:layout_weight="1"
+                    android:background="#40400000"
+                    android:text="Row Spacer"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/terminalTextLarge7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/terminalSpacer7"
+                    android:layout_weight="1"
+                    android:background="#40606060"
+                    android:text="012345678901234567891234"
+                    android:textColor="#FF00FF00"
+                    android:textSize="30sp"
+                    android:typeface="monospace" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/rightPaddingDisplay"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:background="#50000080"
+                android:text="TextView" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

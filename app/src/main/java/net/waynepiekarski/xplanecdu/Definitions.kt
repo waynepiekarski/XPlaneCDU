@@ -22,12 +22,23 @@
 
 package net.waynepiekarski.xplanecdu
 
+import android.app.Activity
+import android.widget.TextView
+
 object Definitions {
 
     class CDUButton(var description: String) {
     }
 
-    class CDULine(var description: String) {
+    class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false) {
+
+        private var view: TextView? = null
+
+        fun getTextView(activity: Activity): TextView {
+            if (view == null)
+                view = activity.findViewById(viewId)
+            return view!!
+        }
     }
 
     val CDUButtonsZibo737 = mapOf(
@@ -102,32 +113,33 @@ object Definitions {
             "laminar/B738/button/fmc1_exec" to CDUButton("FMC captain EXEC"))
 
     val CDULinesZibo737 = mapOf(
-            "laminar/B738/fmc1/Line00_L" to CDULine("PAGE LABEL LARGE FONT"),
-            "laminar/B738/fmc1/Line00_S" to CDULine("PAGE LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line01_X" to CDULine("LINE 1 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line02_X" to CDULine("LINE 2 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line03_X" to CDULine("LINE 3 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line04_X" to CDULine("LINE 4 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line05_X" to CDULine("LINE 5 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line06_X" to CDULine("LINE 6 LABEL SMALL FONT"),
-            "laminar/B738/fmc1/Line01_L" to CDULine("LINE 1 LARGE FONT"),
-            "laminar/B738/fmc1/Line02_L" to CDULine("LINE 2 LARGE FONT"),
-            "laminar/B738/fmc1/Line03_L" to CDULine("LINE 3 LARGE FONT"),
-            "laminar/B738/fmc1/Line04_L" to CDULine("LINE 4 LARGE FONT"),
-            "laminar/B738/fmc1/Line05_L" to CDULine("LINE 5 LARGE FONT"),
-            "laminar/B738/fmc1/Line06_L" to CDULine("LINE 6 LARGE FONT"),
-            "laminar/B738/fmc1/Line01_I" to CDULine("LINE 1 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line02_I" to CDULine("LINE 2 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line03_I" to CDULine("LINE 3 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line04_I" to CDULine("LINE 4 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line05_I" to CDULine("LINE 5 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line06_I" to CDULine("LINE 6 LARGE FONT INVERSE"),
-            "laminar/B738/fmc1/Line01_S" to CDULine("LINE 1 SMALL FONT"),
-            "laminar/B738/fmc1/Line02_S" to CDULine("LINE 2 SMALL FONT"),
-            "laminar/B738/fmc1/Line03_S" to CDULine("LINE 3 SMALL FONT"),
-            "laminar/B738/fmc1/Line04_S" to CDULine("LINE 4 SMALL FONT"),
-            "laminar/B738/fmc1/Line05_S" to CDULine("LINE 5 SMALL FONT"),
-            "laminar/B738/fmc1/Line06_S" to CDULine("LINE 6 SMALL FONT"),
-            "laminar/B738/fmc1/Line_entry" to CDULine("LINE ENTRY LARGE FONT"),
-            "laminar/B738/fmc1/Line_entry_I" to CDULine("LINE ENTRY LARGE FONT INVERSE"))
+            "laminar/B738/fmc1/Line00_L" to CDULine("PAGE LABEL LARGE FONT", R.id.terminalTextLarge0),
+            "laminar/B738/fmc1/Line00_S" to CDULine("PAGE LABEL SMALL FONT", R.id.terminalTextSmall0, small=true),
+            "laminar/B738/fmc1/Line01_X" to CDULine("LINE 1 LABEL SMALL FONT", R.id.terminalLabel1),
+            "laminar/B738/fmc1/Line02_X" to CDULine("LINE 2 LABEL SMALL FONT", R.id.terminalLabel2),
+            "laminar/B738/fmc1/Line03_X" to CDULine("LINE 3 LABEL SMALL FONT", R.id.terminalLabel3),
+            "laminar/B738/fmc1/Line04_X" to CDULine("LINE 4 LABEL SMALL FONT", R.id.terminalLabel4),
+            "laminar/B738/fmc1/Line05_X" to CDULine("LINE 5 LABEL SMALL FONT", R.id.terminalLabel5),
+            "laminar/B738/fmc1/Line06_X" to CDULine("LINE 6 LABEL SMALL FONT", R.id.terminalLabel6),
+            "laminar/B738/fmc1/Line01_L" to CDULine("LINE 1 LARGE FONT", R.id.terminalTextLarge1),
+            "laminar/B738/fmc1/Line02_L" to CDULine("LINE 2 LARGE FONT", R.id.terminalTextLarge2),
+            "laminar/B738/fmc1/Line03_L" to CDULine("LINE 3 LARGE FONT", R.id.terminalTextLarge3),
+            "laminar/B738/fmc1/Line04_L" to CDULine("LINE 4 LARGE FONT", R.id.terminalTextLarge4),
+            "laminar/B738/fmc1/Line05_L" to CDULine("LINE 5 LARGE FONT", R.id.terminalTextLarge5),
+            "laminar/B738/fmc1/Line06_L" to CDULine("LINE 6 LARGE FONT", R.id.terminalTextLarge6),
+            "laminar/B738/fmc1/Line01_I" to CDULine("LINE 1 LARGE FONT INVERSE", R.id.terminalTextLarge1, inverse=true),
+            "laminar/B738/fmc1/Line02_I" to CDULine("LINE 2 LARGE FONT INVERSE", R.id.terminalTextLarge2, inverse=true),
+            "laminar/B738/fmc1/Line03_I" to CDULine("LINE 3 LARGE FONT INVERSE", R.id.terminalTextLarge3, inverse=true),
+            "laminar/B738/fmc1/Line04_I" to CDULine("LINE 4 LARGE FONT INVERSE", R.id.terminalTextLarge4, inverse=true),
+            "laminar/B738/fmc1/Line05_I" to CDULine("LINE 5 LARGE FONT INVERSE", R.id.terminalTextLarge5, inverse=true),
+            "laminar/B738/fmc1/Line06_I" to CDULine("LINE 6 LARGE FONT INVERSE", R.id.terminalTextLarge6, inverse=true),
+            "laminar/B738/fmc1/Line01_S" to CDULine("LINE 1 SMALL FONT", R.id.terminalTextSmall1, small=true),
+            "laminar/B738/fmc1/Line02_S" to CDULine("LINE 2 SMALL FONT", R.id.terminalTextSmall2, small=true),
+            "laminar/B738/fmc1/Line03_S" to CDULine("LINE 3 SMALL FONT", R.id.terminalTextSmall3, small=true),
+            "laminar/B738/fmc1/Line04_S" to CDULine("LINE 4 SMALL FONT", R.id.terminalTextSmall4, small=true),
+            "laminar/B738/fmc1/Line05_S" to CDULine("LINE 5 SMALL FONT", R.id.terminalTextSmall5, small=true),
+            "laminar/B738/fmc1/Line06_S" to CDULine("LINE 6 SMALL FONT", R.id.terminalTextSmall6, small=true),
+            "laminar/B738/fmc1/Line_entry" to CDULine("LINE ENTRY LARGE FONT", R.id.terminalTextLarge7),
+            "laminar/B738/fmc1/Line_entry_I" to CDULine("LINE ENTRY LARGE FONT INVERSE", R.id.terminalTextLarge7, inverse=true)
+    )
 }
