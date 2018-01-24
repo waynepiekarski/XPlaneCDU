@@ -57,409 +57,390 @@
         android:scaleType="fitXY"
         android:src="@drawable/boeing_grey" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/topPaddingDisplay"
         android:layout_width="match_parent"
+        android:layout_height="@dimen/cdu_top_padding"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:layout_below="@+id/topLayout"
+        android:background="@color/cdu_debug_padding_color"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/leftPaddingDisplay"
+        android:layout_width="@dimen/cdu_left_padding"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:orientation="vertical">
+        android:layout_below="@+id/topLayout"
+        android:background="@color/cdu_debug_padding_color"
+        android:text="" />
 
-        <TextView
-            android:id="@+id/topPaddingDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/cdu_top_padding"
-            android:background="@color/cdu_debug_padding_color"
-            android:text="" />
+    <!-- Start row zero -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <TextView
+        android:id="@+id/terminalSpacer0"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/topPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-            <TextView
-                android:id="@+id/leftPaddingDisplay"
-                android:layout_width="@dimen/cdu_left_padding"
-                android:layout_height="match_parent"
-                android:background="@color/cdu_debug_padding_color"
-                android:text="" />
+    <TextView
+        android:id="@+id/terminalTextLarge0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer0"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:layout_weight="1"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="PAGE TITLE 1234567891234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+    <TextView
+        android:id="@+id/terminalTextSmall0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer0"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="PAGE TITLE 2345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row zero -->
+    <!-- Start row one -->
 
-                <TextView
-                    android:id="@+id/terminalSpacer0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <TextView
+        android:id="@+id/terminalSpacer1"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge0"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer0"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="PAGE TITLE 1234567891234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL1 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer0"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="PAGE TITLE 2345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE1 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row one -->
+    <TextView
+        android:id="@+id/terminalTextSmall1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL1 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge0"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row two -->
 
-                <TextView
-                    android:id="@+id/terminalLabel1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer1"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL1 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer2"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel1"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE1 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL2 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel1"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL1 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE2 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row two -->
+    <TextView
+        android:id="@+id/terminalTextSmall2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL2 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge1"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row three -->
 
-                <TextView
-                    android:id="@+id/terminalLabel2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer2"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL2 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer3"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel2"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE2 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL3 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel2"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL2 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE3 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row three -->
+    <TextView
+        android:id="@+id/terminalTextSmall3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL3 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge2"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row four -->
 
-                <TextView
-                    android:id="@+id/terminalLabel3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer3"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL3 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer4"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel3"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE3 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL4 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel3"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL3 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE4 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row four -->
+    <TextView
+        android:id="@+id/terminalTextSmall4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL4 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge3"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row five -->
 
-                <TextView
-                    android:id="@+id/terminalLabel4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer4"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL4 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer5"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel4"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE4 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL5 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel4"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL4 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE5 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row five -->
+    <TextView
+        android:id="@+id/terminalTextSmall5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL5 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge4"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row six -->
 
-                <TextView
-                    android:id="@+id/terminalLabel5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer5"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL5 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer6"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel5"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE5 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalLabel6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_label_text_scale_x"
+        android:text="LABEL6 89012345678901234"
+        android:textColor="@color/cdu_label_text_color"
+        android:textSize="@dimen/cdu_label_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalTextSmall5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel5"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL5 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalTextLarge6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE6 89012345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
-                <!-- Start row six -->
+    <TextView
+        android:id="@+id/terminalTextSmall6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_small_text_scale_x"
+        android:text="SMALL6 89012345678901234"
+        android:textColor="@color/cdu_small_text_color"
+        android:textSize="@dimen/cdu_small_text_font_size"
+        android:typeface="monospace" />
 
-                <TextView
-                    android:id="@+id/terminalSpacer6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge5"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
+    <!-- Start row seven - text entry -->
 
-                <TextView
-                    android:id="@+id/terminalLabel6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer6"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_label_text_scale_x"
-                    android:text="LABEL6 89012345678901234"
-                    android:textColor="@color/cdu_label_text_color"
-                    android:textSize="@dimen/cdu_label_text_font_size"
-                    android:typeface="monospace" />
+    <TextView
+        android:id="@+id/terminalSpacer7"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/cdu_spacer_height"
+        android:layout_below="@+id/terminalTextLarge6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_debug_padding_color"
+        android:text=""
+        android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/terminalTextLarge6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel6"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LARGE6 89012345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
-
-                <TextView
-                    android:id="@+id/terminalTextSmall6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalLabel6"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_small_text_scale_x"
-                    android:text="SMALL6 89012345678901234"
-                    android:textColor="@color/cdu_small_text_color"
-                    android:textSize="@dimen/cdu_small_text_font_size"
-                    android:typeface="monospace" />
-
-                <!-- Start row seven - text entry -->
-
-                <TextView
-                    android:id="@+id/terminalSpacer7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/cdu_spacer_height"
-                    android:layout_below="@+id/terminalTextLarge6"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_debug_padding_color"
-                    android:text=""
-                    android:textSize="10sp" />
-
-                <TextView
-                    android:id="@+id/terminalTextLarge7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/terminalSpacer7"
-                    android:layout_weight="1"
-                    android:background="@color/cdu_text_background"
-                    android:textScaleX="@dimen/cdu_large_text_scale_x"
-                    android:text="LINE ENTRY 2345678901234"
-                    android:textColor="@color/cdu_large_text_color"
-                    android:textSize="@dimen/cdu_large_text_font_size"
-                    android:typeface="monospace" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/terminalTextLarge7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer7"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LINE ENTRY 2345678901234"
+        android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
 
 </RelativeLayout>
