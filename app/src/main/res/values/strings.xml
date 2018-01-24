@@ -1,3 +1,12 @@
 <resources>
+
     <string name="app_name">XPlaneCDU</string>
+
+    <color name="cdu_large_text_color">#FFE0E0E0</color>
+    <color name="cdu_small_text_color">#FFA0A0A0</color>
+    <color name="cdu_label_text_color">#FF00FF00</color>
+
+    <color name="cdu_text_background">#00000000</color>
+    <color name="cdu_debug_padding_color">#40ff0000</color>
+
 </resources>
