@@ -27,10 +27,10 @@ import android.widget.TextView
 
 object Definitions {
 
-    class CDUButton(var description: String) {
+    class CDUButton(var description: String, var x1: Int = -1, var y1: Int = -1, var x2: Int = -1, var y2: Int = -1) {
     }
 
-    class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false) {
+    class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false, var label: Boolean = false) {
 
         private var view: TextView? = null
 
@@ -41,8 +41,19 @@ object Definitions {
         }
     }
 
+    // The pixel coordinates of the CDU image where the text display should be stretched in to
+    val displayYTop    = 35.0f
+    val displayXLeft   = 56.0f
+    val displayYBottom = 220.0f
+    val displayXRight  = 270.0f
+
+    // Ratios of label and small size relative to the large default size
+    val displayLabelRatio = 0.5f
+    val displaySmallRatio = 0.80f
+    val displayLargeRatio = 1.0f
+
     val CDUButtonsZibo737 = mapOf(
-            "laminar/B738/button/fmc1_1L" to CDUButton("FMC captain 1LSK"),
+            "laminar/B738/button/fmc1_1L" to CDUButton("FMC captain 1LSK", 11, 63, 31, 76),
             "laminar/B738/button/fmc1_2L" to CDUButton("FMC captain 2LSK"),
             "laminar/B738/button/fmc1_3L" to CDUButton("FMC captain 3LSK"),
             "laminar/B738/button/fmc1_4L" to CDUButton("FMC captain 4LSK"),
@@ -67,7 +78,7 @@ object Definitions {
             "laminar/B738/button/fmc1_period" to CDUButton("FMC captain period"),
             "laminar/B738/button/fmc1_minus" to CDUButton("FMC captain minus"),
             "laminar/B738/button/fmc1_slash" to CDUButton("FMC captain slash"),
-            "laminar/B738/button/fmc1_A" to CDUButton("FMC captain A"),
+            "laminar/B738/button/fmc1_A" to CDUButton("FMC captain A", 136, 317, 158, 337),
             "laminar/B738/button/fmc1_B" to CDUButton("FMC captain B"),
             "laminar/B738/button/fmc1_C" to CDUButton("FMC captain C"),
             "laminar/B738/button/fmc1_D" to CDUButton("FMC captain D"),
@@ -97,7 +108,7 @@ object Definitions {
             "laminar/B738/button/fmc1_clr" to CDUButton("FMC captain CLR"),
             "laminar/B738/button/fmc1_del" to CDUButton("FMC captain DEL"),
             "laminar/B738/button/fmc1_prev_page" to CDUButton("FMC captain PREV PAGE"),
-            "laminar/B738/button/fmc1_next_page" to CDUButton("FMC captain NEXT PAGE"),
+            "laminar/B738/button/fmc1_next_page" to CDUButton("FMC captain NEXT PAGE", 76, 351, 110, 371),
             "laminar/B738/button/fmc1_init_ref" to CDUButton("FMC captain INIT REF"),
             "laminar/B738/button/fmc1_menu" to CDUButton("FMC captain MENU"),
             "laminar/B738/button/fmc1_n1_lim" to CDUButton("FMC captain N1 LIMIT"),
@@ -115,12 +126,12 @@ object Definitions {
     val CDULinesZibo737 = mapOf(
             "laminar/B738/fmc1/Line00_L" to CDULine("PAGE LABEL LARGE FONT", R.id.terminalTextLarge0),
             "laminar/B738/fmc1/Line00_S" to CDULine("PAGE LABEL SMALL FONT", R.id.terminalTextSmall0, small=true),
-            "laminar/B738/fmc1/Line01_X" to CDULine("LINE 1 LABEL SMALL FONT", R.id.terminalLabel1),
-            "laminar/B738/fmc1/Line02_X" to CDULine("LINE 2 LABEL SMALL FONT", R.id.terminalLabel2),
-            "laminar/B738/fmc1/Line03_X" to CDULine("LINE 3 LABEL SMALL FONT", R.id.terminalLabel3),
-            "laminar/B738/fmc1/Line04_X" to CDULine("LINE 4 LABEL SMALL FONT", R.id.terminalLabel4),
-            "laminar/B738/fmc1/Line05_X" to CDULine("LINE 5 LABEL SMALL FONT", R.id.terminalLabel5),
-            "laminar/B738/fmc1/Line06_X" to CDULine("LINE 6 LABEL SMALL FONT", R.id.terminalLabel6),
+            "laminar/B738/fmc1/Line01_X" to CDULine("LINE 1 LABEL SMALL FONT", R.id.terminalLabel1, label=true),
+            "laminar/B738/fmc1/Line02_X" to CDULine("LINE 2 LABEL SMALL FONT", R.id.terminalLabel2, label=true),
+            "laminar/B738/fmc1/Line03_X" to CDULine("LINE 3 LABEL SMALL FONT", R.id.terminalLabel3, label=true),
+            "laminar/B738/fmc1/Line04_X" to CDULine("LINE 4 LABEL SMALL FONT", R.id.terminalLabel4, label=true),
+            "laminar/B738/fmc1/Line05_X" to CDULine("LINE 5 LABEL SMALL FONT", R.id.terminalLabel5, label=true),
+            "laminar/B738/fmc1/Line06_X" to CDULine("LINE 6 LABEL SMALL FONT", R.id.terminalLabel6, label=true),
             "laminar/B738/fmc1/Line01_L" to CDULine("LINE 1 LARGE FONT", R.id.terminalTextLarge1),
             "laminar/B738/fmc1/Line02_L" to CDULine("LINE 2 LARGE FONT", R.id.terminalTextLarge2),
             "laminar/B738/fmc1/Line03_L" to CDULine("LINE 3 LARGE FONT", R.id.terminalTextLarge3),

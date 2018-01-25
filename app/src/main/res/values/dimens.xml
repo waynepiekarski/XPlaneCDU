@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="cdu_top_padding">110dp</dimen>
-    <dimen name="cdu_left_padding">160dp</dimen>
-    <dimen name="cdu_right_padding">160dp</dimen>
+    <!-- Need to specify something for the initial layout, but it will be recomputed -->
+    <dimen name="cdu_top_padding">10dp</dimen>
+    <dimen name="cdu_left_padding">100dp</dimen>
 
-    <dimen name="cdu_large_text_scale_x">1.7</dimen>
-    <dimen name="cdu_small_text_scale_x">1.7</dimen>
-    <dimen name="cdu_label_text_scale_x">1.7</dimen>
+    <!-- Need to specify a default X scale for the font, but it will be recomputed -->
+    <dimen name="cdu_large_text_scale_x">1.0</dimen>
+    <dimen name="cdu_small_text_scale_x">1.0</dimen>
+    <dimen name="cdu_label_text_scale_x">1.0</dimen>
 
+    <!-- The layout preview needs a decent font size, but it will be recomputed -->
     <dimen name="cdu_large_text_font_size">23sp</dimen>
     <dimen name="cdu_small_text_font_size">23sp</dimen>
     <dimen name="cdu_label_text_font_size">23sp</dimen>
 
-    <dimen name="cdu_spacer_height">1dp</dimen>
+    <!-- Spacers between the labels in case we want to tweak this programmatically -->
+    <dimen name="cdu_spacer_height">0px</dimen>
 
 </resources>
