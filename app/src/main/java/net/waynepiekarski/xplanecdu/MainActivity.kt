@@ -195,13 +195,12 @@ class MainActivity : Activity(), TCPClient.OnReceiveTCP, MulticastReceiver.OnRec
                     canvas.drawLine(x2, y2, x1, y2, paint)
                     canvas.drawLine(x1, y2, x1, y1, paint)
                 }
+
                 drawBox(canvas, Definitions.displayXLeft, Definitions.displayYTop, Definitions.displayXRight, Definitions.displayYBottom, paint)
 
                 for (entry in Definitions.CDUButtonsZibo737) {
                     if (entry.value.x1 >= 0) {
-                        val parts = entry.key.split('_')
-                        val label = parts[1] // Only show the key or first part of the name
-                        canvas.drawText(label, entry.value.x1.toFloat() + 2.0f, entry.value.y2.toFloat() - 2.0f, paint)
+                        canvas.drawText(entry.value.label, entry.value.x1.toFloat() + 3.0f, entry.value.y2.toFloat() - 3.0f, paint)
                         drawBox(canvas, entry.value.x1.toFloat(), entry.value.y1.toFloat(), entry.value.x2.toFloat(), entry.value.y2.toFloat(), paint)
                     }
                 }
