@@ -2,6 +2,12 @@
 
     <string name="app_name">XPlaneCDU</string>
 
+    <color name="about_text_background">#E0000000</color>
+    <color name="about_text_color">#FFFFFF00</color>
+
+    <color name="connect_text_background">#00000000</color>
+    <color name="connect_text_color">#FF000000</color>
+
     <color name="cdu_large_text_color">#FFE0E0E0</color>
     <color name="cdu_small_text_color">#FFA0A0A0</color>
     <color name="cdu_label_text_color">#FF00FF00</color>

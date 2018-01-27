@@ -8,62 +8,43 @@
     android:id="@+id/mainLayout"
     tools:context="net.waynepiekarski.xplanecdu.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/topLayout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="XPlaneCDU"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/ipAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:text="IP Addr"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/xplaneHost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="No X-Plane Found"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/versionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Version"
-            android:textAlignment="center" />
-
-    </LinearLayout>
-
     <ImageView
         android:id="@+id/cduImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/topLayout"
         android:scaleType="fitXY"
         android:src="@drawable/zibo_737_cdu" />
+
+    <ImageView
+        android:id="@+id/cduHelp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:src="@drawable/zibo_737_cdu" />
+
+    <TextView
+        android:id="@+id/connectText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Initializing"
+        android:textColor="@color/connect_text_color"
+        android:textSize="@dimen/connect_text_size"
+        android:background="@color/connect_text_background"
+        android:layout_centerHorizontal="true"
+        android:padding="@dimen/connect_text_padding"
+        android:textAlignment="center" />
 
     <TextView
         android:id="@+id/topPaddingDisplay"
         android:layout_width="match_parent"
         android:layout_height="@dimen/cdu_top_padding"
         android:layout_toRightOf="@+id/leftPaddingDisplay"
-        android:layout_below="@+id/topLayout"
         android:background="@color/cdu_debug_padding_color"
         android:text="" />
 
@@ -71,7 +52,6 @@
         android:id="@+id/leftPaddingDisplay"
         android:layout_width="@dimen/cdu_left_padding"
         android:layout_height="match_parent"
-        android:layout_below="@+id/topLayout"
         android:background="@color/cdu_debug_padding_color"
         android:text="" />
 
@@ -443,5 +423,30 @@
         android:textColor="@color/cdu_large_text_color"
         android:textSize="@dimen/cdu_large_text_font_size"
         android:typeface="monospace" />
+
+    <!-- About text that can pop up above the rest of the UI -->
+    <TextView
+        android:id="@+id/aboutText"
+        android:layout_width="@dimen/about_text_width"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/connectText"
+        android:background="@drawable/about"
+        android:padding="@dimen/about_text_padding"
+        android:text="X P l a n e C D U   -   __VERSION__\n
+Android CDU for X-Plane 11\n\n
+Copyright (C) 2018 - Wayne Piekarski\n
+http://www.waynepiekarski.net\n\n
+Licensed under the GNU Public License v3\n
+Source code available from\n
+https://github.com/waynepiekarski/XPlaneCDU\n\n
+Requirements:\n
+- ExtPlane v2 plugin from https://github.com/vranki/ExtPlane\n
+- X-Plane 11\n
+- Zibo's Boeing 738\n
+- Open TCP port 51000 for ExtPlane"
+        android:textColor="@color/about_text_color"
+        android:textSize="@dimen/about_text_size"
+        android:visibility="gone" />
 
 </RelativeLayout>

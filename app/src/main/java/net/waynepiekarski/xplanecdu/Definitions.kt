@@ -53,6 +53,14 @@ object Definitions {
     val displayLargeRatio = 1.0f
 
     val CDUButtonsZibo737 = mapOf(
+
+            "internal_help_1" to CDUButton("internal_help",   0,   0,  46,   86, "HELP1"),
+            "internal_help_2" to CDUButton("internal_help", 633,   0, 682,   86, "HELP2"),
+            "internal_help_3" to CDUButton("internal_help",   0, 498,  47,  730, "HELP3"),
+            "internal_help_4" to CDUButton("internal_help", 631, 464, 682,  729, "HELP4"),
+            "internal_help_5" to CDUButton("internal_help",   0, 948,  52, 1074, "HELP5"),
+            "internal_help_6" to CDUButton("internal_help", 630, 947, 683, 1073, "HELP6"),
+
             "laminar/B738/button/fmc1_1L" to CDUButton("FMC captain 1LSK", 6, 116, 52, 151, "1L"),
             "laminar/B738/button/fmc1_2L" to CDUButton("FMC captain 2LSK", 6, 170, 52, 205, "2L"),
             "laminar/B738/button/fmc1_3L" to CDUButton("FMC captain 3LSK", 6, 225, 52, 258, "3L"),
@@ -109,6 +117,7 @@ object Definitions {
             "laminar/B738/button/fmc1_hold"    to CDUButton("FMC captain HOLD",    338, 597, 410, 649, "HOLD"),
             "laminar/B738/button/fmc1_prog"    to CDUButton("FMC captain PROG",    425, 597, 497, 649, "PROG"),
             "laminar/B738/button/fmc1_exec"    to CDUButton("FMC captain EXEC",    540, 611, 609, 649, "EXEC"),
+            "internal_exec_light"              to CDUButton("EXEC light",          551, 590, 597, 596, "EXEC LIGHT"),
 
             "laminar/B738/button/fmc1_n1_lim"    to CDUButton("FMC captain N1 LIMIT",  76, 665, 148, 715,  "N1 LIMIT"),
             "laminar/B738/button/fmc1_fix"       to CDUButton("FMC captain FIX",       164, 665, 235, 715, "FIX"),

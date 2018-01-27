@@ -31,17 +31,28 @@ import kotlin.concurrent.thread
 import java.io.*
 
 
-class TCPClient (address: InetAddress, port: Int, internal var callback: OnReceiveTCP) {
+class TCPClient (var address: InetAddress, var port: Int, internal var callback: OnTCPEvent) {
     private lateinit var socket: Socket
     @Volatile private var cancelled = false
     private lateinit var bufferedWriter: BufferedWriter
+    private lateinit var bufferedReader: BufferedReader
+    private lateinit var inputStreamReader: InputStreamReader
+    private lateinit var outputStreamWriter: OutputStreamWriter
 
-    interface OnReceiveTCP {
+    interface OnTCPEvent {
         fun onReceiveTCP(line: String)
+        fun onConnectTCP()
+        fun onDisconnectTCP()
     }
 
     fun stopListener() {
+        // Stop the loop from running any more
         cancelled = true
+
+        // Call close on the top level buffers to cause any pending read to fail, ending the loop
+        closeBuffers()
+
+        // The socketThread loop will now clean up everything
     }
 
     fun writeln(str: String) {
@@ -51,38 +62,83 @@ class TCPClient (address: InetAddress, port: Int, internal var callback: OnRecei
         bufferedWriter.flush()
     }
 
-    init {
-        Log.d(Const.TAG, "Created thread to connect to $address on port $port")
-        thread(start = true) {
+    private fun closeBuffers() {
+        // Call close on the top level buffers which will propagate to the original socket
+        // and cause any pending reads and writes to fail
+        if (::bufferedWriter.isInitialized) {
             try {
-                socket = Socket(address, port)
-
-                val inputStreamReader = InputStreamReader(socket.getInputStream())
-                val bufferedReader = BufferedReader(inputStreamReader)
-                val outputStreamWriter = OutputStreamWriter(socket.getOutputStream())
-                bufferedWriter = BufferedWriter(outputStreamWriter)
-
-                while (!cancelled) {
-                    val line = bufferedReader.readLine()
-                    if (line == null) {
-                        Log.d(Const.TAG, "readLine returned null, connection has failed")
-                        cancelled = true
-                    }
-                    Log.d(Const.TAG, "TCP returned line [$line]")
-                    Handler(Looper.getMainLooper()).post {
-                        callback.onReceiveTCP(line)
-                    }
-                }
-            } catch (e: SocketTimeoutException) {
-                // Log.d(Const.TAG, "Timeout, reading again ...");
-            } catch (e: IOException) {
-                Log.e(Const.TAG, "Socket failed " + e)
-            } finally {
-                Log.d(Const.TAG, "Thread is cancelled, closing down TCP listener")
+                Log.d(Const.TAG, "Closing bufferedWriter")
                 bufferedWriter.close()
-                socket.close()
-                Log.d(Const.TAG, "TCP listener thread for port $port has ended")
+            } catch (e: IOException) {
+                Log.d(Const.TAG, "Closing bufferedWriter in stopListener caused IOException, this is probably ok")
             }
+        }
+        if (::bufferedReader.isInitialized) {
+            try {
+                Log.d(Const.TAG, "Closing bufferedReader")
+                bufferedReader.close()
+            } catch (e: IOException) {
+                Log.d(Const.TAG, "Closing bufferedReader in stopListener caused IOException, this is probably ok")
+            }
+        }
+    }
+
+    // In a separate function so we can "return" any time to bail out
+    private fun socketThread() {
+        try {
+            socket = Socket(address, port)
+        } catch (e: Exception) {
+            Log.e(Const.TAG, "Failed to connect to $address:$port with exception $e")
+            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+            return
+        }
+
+        // Wrap the socket up so we can work with it - no exceptions should be thrown here
+        try {
+            inputStreamReader = InputStreamReader(socket.getInputStream())
+            bufferedReader = BufferedReader(inputStreamReader)
+            outputStreamWriter = OutputStreamWriter(socket.getOutputStream())
+            bufferedWriter = BufferedWriter(outputStreamWriter)
+        } catch (e: IOException) {
+            Log.e(Const.TAG, "Exception while opening socket buffers $e")
+            closeBuffers()
+            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+            return
+        }
+
+        // Connection should be established, everything is ready to read and write
+        Handler(Looper.getMainLooper()).post { callback.onConnectTCP() }
+
+        // Start reading from the socket, any writes happen from another thread
+        while (!cancelled) {
+            var line: String?
+            try {
+                line = bufferedReader.readLine()
+            } catch (e: IOException) {
+                Log.d(Const.TAG, "Exception during socket readLine $e")
+                line = null
+            }
+            if (line == null) {
+                Log.d(Const.TAG, "readLine returned null, connection has failed")
+                cancelled = true
+            } else {
+                Log.d(Const.TAG, "TCP returned line [$line]")
+                Handler(Looper.getMainLooper()).post { callback.onReceiveTCP(line) }
+            }
+        }
+
+        // Close any outer buffers we own, which will propagate to the original socket
+        closeBuffers()
+
+        // The connection is gone, tell the listener in case they need to update the UI
+        Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+    }
+
+    // Constructor starts a new thread to handle the blocking outbound connection
+    init {
+        Log.d(Const.TAG, "Created thread to connect to $address:$port")
+        thread(start = true) {
+            socketThread()
         }
     }
 }
