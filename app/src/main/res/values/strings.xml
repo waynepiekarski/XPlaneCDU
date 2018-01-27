@@ -8,9 +8,9 @@
     <color name="connect_text_background">#00000000</color>
     <color name="connect_text_color">#FF000000</color>
 
-    <color name="cdu_large_text_color">#FFE0E0E0</color>
-    <color name="cdu_small_text_color">#FFA0A0A0</color>
-    <color name="cdu_label_text_color">#FF00FF00</color>
+    <color name="cdu_large_text_color">#FFD0D0D0</color>
+    <color name="cdu_small_text_color">#FFD0D0D0</color>
+    <color name="cdu_label_text_color">#FFD0D0D0</color>
 
     <!-- CDU text must be transparent for small to not hide large -->
     <color name="cdu_text_background">#00000000</color>

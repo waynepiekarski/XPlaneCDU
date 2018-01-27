@@ -68,6 +68,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge0"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer0"
@@ -82,6 +84,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall0"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/leftPaddingDisplay"
@@ -107,6 +111,8 @@
 
     <TextView
         android:id="@+id/terminalLabel1"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer1"
@@ -120,6 +126,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge1"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel1"
@@ -133,6 +141,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall1"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge1"
@@ -158,6 +168,8 @@
 
     <TextView
         android:id="@+id/terminalLabel2"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer2"
@@ -171,6 +183,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge2"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel2"
@@ -184,6 +198,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall2"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge2"
@@ -209,6 +225,8 @@
 
     <TextView
         android:id="@+id/terminalLabel3"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer3"
@@ -222,6 +240,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge3"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel3"
@@ -235,6 +255,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall3"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge3"
@@ -260,6 +282,8 @@
 
     <TextView
         android:id="@+id/terminalLabel4"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer4"
@@ -273,6 +297,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge4"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel4"
@@ -286,6 +312,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall4"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge4"
@@ -311,6 +339,8 @@
 
     <TextView
         android:id="@+id/terminalLabel5"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer5"
@@ -324,6 +354,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge5"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel5"
@@ -337,6 +369,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall5"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge5"
@@ -362,6 +396,8 @@
 
     <TextView
         android:id="@+id/terminalLabel6"
+        android:layout_marginTop="@dimen/cdu_label_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer6"
@@ -375,6 +411,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge6"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalLabel6"
@@ -388,6 +426,8 @@
 
     <TextView
         android:id="@+id/terminalTextSmall6"
+        android:layout_marginTop="@dimen/cdu_small_margin"
+        android:layout_marginBottom="@dimen/cdu_small_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/terminalTextLarge6"
@@ -413,6 +453,8 @@
 
     <TextView
         android:id="@+id/terminalTextLarge7"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/terminalSpacer7"

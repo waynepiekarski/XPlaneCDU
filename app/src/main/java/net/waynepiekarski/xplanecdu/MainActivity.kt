@@ -33,6 +33,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.RelativeLayout
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.InetAddress
@@ -144,8 +145,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         Definitions.displayLargeRatio
                     tv.setTextSize(fontSize * scale)
                     tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                    val lp = tv.getLayoutParams() as RelativeLayout.LayoutParams
                     if (!entry.value.small) // Small overlaps with large, don't add it to the total
-                        totalHeight += tv.getMeasuredHeight()
+                        totalHeight += tv.getMeasuredHeight() + lp.topMargin + lp.bottomMargin // Include negative margins
                 }
                 Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
                 if (validSet) {

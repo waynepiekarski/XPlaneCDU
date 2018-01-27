@@ -42,15 +42,15 @@ object Definitions {
     }
 
     // The pixel coordinates of the CDU image where the text display should be stretched in to
-    val displayYTop    = 68.0f
+    val displayYTop    = 64.0f
     val displayXLeft   = 108.0f
-    val displayYBottom = 454.0f
+    val displayYBottom = 455.0f
     val displayXRight  = 575.0f
 
     // Ratios of label and small size relative to the large default size
-    val displayLabelRatio = 0.5f
-    val displaySmallRatio = 0.80f
-    val displayLargeRatio = 1.0f
+    val displayLabelRatio = 0.76f
+    val displaySmallRatio = 0.76f
+    val displayLargeRatio = 1.00f
 
     val CDUButtonsZibo737 = mapOf(
 

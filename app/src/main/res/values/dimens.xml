@@ -25,4 +25,9 @@
     <!-- Spacers between the labels in case we want to tweak this programmatically -->
     <dimen name="cdu_spacer_height">0px</dimen>
 
+    <!-- Negative margins used to bring the TextViews closwer together than normally possible -->
+    <dimen name="cdu_large_margin">-5dp</dimen>
+    <dimen name="cdu_small_margin">-5dp</dimen>
+    <dimen name="cdu_label_margin">-5dp</dimen>
+
 </resources>
