@@ -416,16 +416,19 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             val tokens = line.split(" ")
             if (tokens[0] == "ub") {
                 val decoded = String(Base64.decode(tokens[2], Base64.DEFAULT))
+                // Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
+                val fixed = decoded.replace('`','\u00B0').replace('*','\u25CA')
+
                 Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
                 val entry = Definitions.CDULinesZibo737[tokens[1]]
                 if (entry == null) {
-                    Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$decoded]")
+                    Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$fixed]")
                 } else {
                     val view = entry.getTextView(this)
                     if (entry.inverse) {
                         Log.d(Const.TAG, "Ignoring _I inverted message, not sure what [ ] means right now")
                     } else {
-                        view.setText(decoded)
+                        view.setText(fixed)
                     }
                 }
             } else {
