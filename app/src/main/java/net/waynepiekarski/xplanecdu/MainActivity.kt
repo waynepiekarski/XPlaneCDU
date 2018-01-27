@@ -82,9 +82,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 cduHelp.visibility = View.VISIBLE
                                 aboutText.visibility = View.VISIBLE
                             }
-                        } else {
+                        } else if (entry.key.startsWith("laminar/")) {
                             // Regular button press
                             Log.d(Const.TAG, "Need to send command ${entry.key} for ${entry.value.label}")
+                            sendCommand(entry.key)
+                        } else {
+                            Log.w(Const.TAG, "Unknown command ${entry.key} for ${entry.value.label} - ignored")
                         }
                     }
                 }
@@ -248,6 +251,18 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             }
         }
     }
+
+    fun sendCommand(cmnd: String) {
+        // Send the command on a separate thread
+        thread(start = true) {
+            if (tcp_extplane != null) {
+                tcp_extplane!!.writeln("cmd once $cmnd")
+            } else {
+                Log.d(Const.TAG, "Ignoring command $cmnd since TCP connection is not available")
+            }
+        }
+    }
+
 
     fun padString24(str: String = "", brackets: Boolean = false): String {
         if (brackets)
