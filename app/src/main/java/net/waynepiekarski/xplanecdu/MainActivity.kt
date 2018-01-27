@@ -162,45 +162,49 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             Log.d(Const.TAG, "Found fitting font size $validFontSize")
 
             // Compute a suitable width for each line type (small, large, label)
-            var scaleXSmall = 1.0f
+            // The step size needs to be small enough otherwise the rows won't all align, 0.02f fails
+            // Need to pick a small enough starting point, because 1.0 on some devices is too wide
+            val scaleStep = 0.01f
+            val scaleInitial = 0.05f
+            var scaleXSmall = scaleInitial
             while (true) {
                 terminalTextSmall1.setTextScaleX(scaleXSmall)
                 terminalTextSmall1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextSmall1.getMeasuredWidth()
                 Log.d(Const.TAG, "After X scale $scaleXSmall received width $width for small lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
-                    scaleXSmall += 0.02f
+                    scaleXSmall += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
-                    scaleXSmall -= 0.02f
+                    scaleXSmall -= scaleStep
                     break
                 }
             }
-            var scaleXLarge = 1.0f
+            var scaleXLarge = scaleInitial
             while (true) {
                 terminalTextLarge1.setTextScaleX(scaleXLarge)
                 terminalTextLarge1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextLarge1.getMeasuredWidth()
                 Log.d(Const.TAG, "After X scale $scaleXLarge received width $width for large lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
-                    scaleXLarge += 0.02f
+                    scaleXLarge += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
-                    scaleXLarge -= 0.02f
+                    scaleXLarge -= scaleStep
                     break
                 }
             }
-            var scaleXLabel = 1.0f
+            var scaleXLabel = scaleInitial
             while (true) {
                 terminalLabel1.setTextScaleX(scaleXLabel)
                 terminalLabel1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalLabel1.getMeasuredWidth()
                 Log.d(Const.TAG, "After X scale $scaleXLabel received width $width for label lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
-                    scaleXLabel += 0.02f
+                    scaleXLabel += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
-                    scaleXLabel -= 0.02f
+                    scaleXLabel -= scaleStep
                     break
                 }
             }
