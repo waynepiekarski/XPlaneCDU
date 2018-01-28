@@ -483,10 +483,14 @@ Licensed under the GNU Public License v3\n
 Source code available from\n
 https://github.com/waynepiekarski/XPlaneCDU\n\n
 Requirements:\n
-- ExtPlane v2 plugin from https://github.com/vranki/ExtPlane\n
+- Pre-compiled ExtPlane v2 plugin from http://waynepiekarski.net/ExtPlane\n
 - X-Plane 11\n
 - Zibo's Boeing 738\n
-- Open TCP port 51000 for ExtPlane"
+- Open TCP port 51000 for ExtPlane\n
+\n
+Note that you cannot use the existing ExtPlane v1 binaries because they have bugs related to string datarefs.\n
+\n
+See https://github.com/waynepiekarski/ExtPlane for more info about my ExtPlane plugin, which is forked from https://github.com/vranki/ExtPlane"
         android:textColor="@color/about_text_color"
         android:textSize="@dimen/about_text_size"
         android:visibility="gone" />
