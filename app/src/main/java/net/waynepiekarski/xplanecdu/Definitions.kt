@@ -23,11 +23,14 @@
 package net.waynepiekarski.xplanecdu
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.widget.TextView
 
 object Definitions {
 
-    class CDUButton(var description: String, var x1: Int = -1, var y1: Int = -1, var x2: Int = -1, var y2: Int = -1, var label: String) {
+    class CDUButton(var description: String, var x1: Int = -1, var y1: Int = -1, var x2: Int = -1, var y2: Int = -1, var label: String, var light: Boolean = false) {
+        var brightBitmap: Bitmap? = null // Used to cache a copy of the area illuminated
+        var illuminate: Boolean = false
     }
 
     class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false, var label: Boolean = false) {
@@ -117,7 +120,11 @@ object Definitions {
             "laminar/B738/button/fmc1_hold"    to CDUButton("FMC captain HOLD",    338, 597, 410, 649, "HOLD"),
             "laminar/B738/button/fmc1_prog"    to CDUButton("FMC captain PROG",    425, 597, 497, 649, "PROG"),
             "laminar/B738/button/fmc1_exec"    to CDUButton("FMC captain EXEC",    540, 611, 609, 649, "EXEC"),
-            "internal_exec_light"              to CDUButton("EXEC light",          551, 590, 597, 596, "EXEC LIGHT"),
+
+            "laminar/B738/indicators/fmc_exec_lights" to CDUButton("EXEC light", 551, 590, 597, 596, "EXEC", light=true),
+            "laminar/B738/fmc/fmc_message"            to CDUButton("MSG light",  632, 757, 651, 827, "MSG",  light=true),
+            "internal_ofst_light"              to CDUButton("OFST light",        632, 828, 651, 922, "OFST"),
+            "internal_dspyfail_light"          to CDUButton("DSPY FAIL light",    30, 757,  48, 921, "DSPYFAIL"),
 
             "laminar/B738/button/fmc1_n1_lim"    to CDUButton("FMC captain N1 LIMIT",  76, 665, 148, 715,  "N1 LIMIT"),
             "laminar/B738/button/fmc1_fix"       to CDUButton("FMC captain FIX",       164, 665, 235, 715, "FIX"),

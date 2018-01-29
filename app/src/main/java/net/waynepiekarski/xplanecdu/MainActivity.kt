@@ -24,9 +24,7 @@ package net.waynepiekarski.xplanecdu
 
 import android.app.Activity
 import android.content.res.Configuration
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Base64
@@ -39,12 +37,18 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.net.InetAddress
 import kotlin.concurrent.thread
 
+
+
 class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnReceiveMulticast {
 
     private var becn_listener: MulticastReceiver? = null
     private var tcp_extplane: TCPClient? = null
     private var connectAddress: String? = null
     private var connectWorking = false
+    private lateinit var overlayCanvas: Canvas
+    private lateinit var sourceBitmap: Bitmap
+    private var overlayOutlines = false
+    private var overlayLightExec = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +68,10 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 Log.d(Const.TAG, "ImageClick = ${ix},${iy}, RawClick = ${motionEvent.x},${motionEvent.y} from Image ${cduImage.getDrawable().intrinsicWidth},${cduImage.getDrawable().intrinsicHeight} -> ${cduImage.width},${cduImage.height}")
 
                 // If the help is visible, hide it on any kind of click
-                if (cduHelp.visibility == View.VISIBLE) {
-                    cduHelp.visibility = View.INVISIBLE
+                if (aboutText.visibility == View.VISIBLE) {
                     aboutText.visibility = View.INVISIBLE
+                    overlayOutlines = false
+                    refreshOverlay()
                     return@setOnTouchListener true
                 }
 
@@ -74,14 +79,18 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 for (entry in Definitions.CDUButtonsZibo737) {
                     if ((ix >= entry.value.x1) && (ix <= entry.value.x2) && (iy >= entry.value.y1) && (iy <= entry.value.y2)) {
                         Log.d(Const.TAG, "Found click matches to key ${entry.key}")
-                        if (entry.key.startsWith("internal_help")) {
+                        if (entry.value.light) {
+                            // Do not handle clicks within lights, they are not buttons
+                        } else if (entry.key.startsWith("internal_help")) {
                             // One of the many help buttons were pressed, they all map to the same action
-                            if (cduHelp.visibility == View.VISIBLE) {
-                                cduHelp.visibility = View.INVISIBLE
+                            if (aboutText.visibility == View.VISIBLE) {
                                 aboutText.visibility = View.INVISIBLE
+                                overlayOutlines = false
+                                refreshOverlay()
                             } else {
-                                cduHelp.visibility = View.VISIBLE
                                 aboutText.visibility = View.VISIBLE
+                                overlayOutlines = true
+                                refreshOverlay()
                             }
                         } else if (entry.key.startsWith("laminar/")) {
                             // Regular button press
@@ -219,6 +228,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             }
 
             // Apply the final text sizes to all lines now
+            Log.d(Const.TAG, "Applying final text sizes to all lines now")
             for (entry in Definitions.CDULinesZibo737) {
                 val tv = entry.value.getTextView(this)
                 if (entry.value.small)      tv.setTextScaleX(scaleXSmall)
@@ -226,34 +236,79 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 else                        tv.setTextScaleX(scaleXLarge)
             }
 
-            // Draw a debugging view that shows where all the keys are specified
-            val debug = true
-            if (debug) {
-                val bitmapDrawable = cduImage.getDrawable() as BitmapDrawable
-                val bitmap = bitmapDrawable.getBitmap()
-                val bitmapCopy = bitmap.copy(bitmap.getConfig(), true)
-                val canvas = Canvas(bitmapCopy)
-                val paint = Paint()
-                paint.color = Color.RED
+            // Create a transparent overlay to draw key outlines and also any other indicators
+            val bitmapDrawable = cduImage.getDrawable() as BitmapDrawable
+            sourceBitmap = bitmapDrawable.getBitmap()
+            val bitmapNew = Bitmap.createBitmap(sourceBitmap.width, sourceBitmap.height, Bitmap.Config.ARGB_8888)
+            overlayCanvas = Canvas(bitmapNew)
+            Log.d(Const.TAG, "Adding overlay bitmap of size ${bitmapNew.width}x${bitmapNew.height}")
+            cduHelp.setImageBitmap(bitmapNew)
 
-                fun drawBox(canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float, paint: Paint) {
-                    canvas.drawLine(x1, y1, x2, y1, paint)
-                    canvas.drawLine(x2, y1, x2, y2, paint)
-                    canvas.drawLine(x2, y2, x1, y2, paint)
-                    canvas.drawLine(x1, y2, x1, y1, paint)
-                }
+            // Refresh the overlay for the first time
+            refreshOverlay()
+        }
+    }
 
-                drawBox(canvas, Definitions.displayXLeft, Definitions.displayYTop, Definitions.displayXRight, Definitions.displayYBottom, paint)
+    fun refreshOverlay() {
+        // Always clear the overlay first, this is not a super efficient process, but not used very often
+        overlayCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
 
-                for (entry in Definitions.CDUButtonsZibo737) {
-                    if (entry.value.x1 >= 0) {
-                        canvas.drawText(entry.value.label, entry.value.x1.toFloat() + 3.0f, entry.value.y2.toFloat() - 3.0f, paint)
-                        drawBox(canvas, entry.value.x1.toFloat(), entry.value.y1.toFloat(), entry.value.x2.toFloat(), entry.value.y2.toFloat(), paint)
+        fun drawBox(canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float, paint: Paint) {
+            canvas.drawLine(x1, y1, x2, y1, paint)
+            canvas.drawLine(x2, y1, x2, y2, paint)
+            canvas.drawLine(x2, y2, x1, y2, paint)
+            canvas.drawLine(x1, y2, x1, y1, paint)
+        }
+
+        // Illuminate the exec light if active
+        val exec = Definitions.CDUButtonsZibo737["laminar/B738/indicators/fmc_exec_lights"]!!
+        if (exec!!.illuminate) {
+            val paint = Paint()
+            paint.color = Color.YELLOW
+            paint.style = Paint.Style.FILL
+            overlayCanvas.drawRect(exec.x1.toFloat(), exec.y1.toFloat(), exec.x2.toFloat()+1, exec.y2.toFloat()+1, paint)
+        }
+
+        // We have other lamp indicators where we apply a color booster to make it look illuminated
+        for (lamp in arrayOf("laminar/B738/fmc/fmc_message", "internal_ofst_light", "internal_dspyfail_light")) {
+            val item = Definitions.CDUButtonsZibo737[lamp]!!
+            if (!item.illuminate)
+                continue
+            val paint = Paint()
+            paint.style = Paint.Style.FILL
+
+            if (item.brightBitmap == null) {
+                val partBitmap = Bitmap.createBitmap(item.x2 - item.x1, item.y2 - item.y1, Bitmap.Config.ARGB_8888)
+
+                for (x in item.x1..item.x2 - 1) {
+                    for (y in item.y1..item.y2 - 1) {
+                        var color = sourceBitmap.getPixel(x, y)
+                        if (Color.red(color) < 0x20)
+                            color = Color.BLACK
+                        else
+                            color = Color.YELLOW
+
+                        partBitmap.setPixel(x - item.x1, y - item.y1, color)
                     }
                 }
+                item.brightBitmap = partBitmap
+            }
 
-                Log.d(Const.TAG, "Applying debug bitmap of size ${bitmapCopy.width}x${bitmapCopy.height}")
-                cduHelp.setImageBitmap(bitmapCopy)
+            overlayCanvas.drawBitmap(item.brightBitmap, item.x1.toFloat(), item.y1.toFloat(), paint)
+        }
+
+        // Draw the key outlines if they are active
+        if (overlayOutlines) {
+            val paint = Paint()
+            paint.color = Color.RED
+
+            drawBox(overlayCanvas, Definitions.displayXLeft, Definitions.displayYTop, Definitions.displayXRight, Definitions.displayYBottom, paint)
+
+            for (entry in Definitions.CDUButtonsZibo737) {
+                if (entry.value.x1 >= 0) {
+                    overlayCanvas.drawText(entry.value.label, entry.value.x1.toFloat() + 3.0f, entry.value.y2.toFloat() - 3.0f, paint)
+                    drawBox(overlayCanvas, entry.value.x1.toFloat(), entry.value.y1.toFloat(), entry.value.x2.toFloat(), entry.value.y2.toFloat(), paint)
+                }
             }
         }
     }
@@ -410,6 +465,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
                     tcp_extplane!!.writeln("sub " + entry.key)
                 }
+                for (entry in Definitions.CDUButtonsZibo737) {
+                    if (entry.value.light) {
+                        Log.d(Const.TAG, "Requesting illuminated status key=" + entry.key + " value=" + entry.value.description)
+                        tcp_extplane!!.writeln("sub " + entry.key)
+                    }
+                }
             }
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
@@ -437,6 +498,21 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         view.setText(fixed)
                     }
                 }
+            } else if (tokens[0] == "ud") {
+                val number = tokens[2].toFloat()
+                Log.d(Const.TAG, "Decoded number for name [${tokens[1]}] with value [$number]")
+                val entry = Definitions.CDUButtonsZibo737[tokens[1]]
+                if (entry == null) {
+                    Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with value [$number]")
+                } else {
+                    if (entry.light) {
+                        entry.illuminate = (number > 0.5f)
+                        refreshOverlay()
+                    } else {
+                        Log.d(Const.TAG, "Found non-light name [${tokens[1]}] with value [$number]")
+                    }
+                }
+
             } else {
                 Log.e(Const.TAG, "Unknown encoding type [${tokens[0]}] for name [${tokens[1]}]")
             }

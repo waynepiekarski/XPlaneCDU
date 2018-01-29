@@ -2,5 +2,5 @@
 <resources>
     <!-- Size of the about and info text on large sw600dp devices -->
     <dimen name="about_text_size">18dp</dimen>
-    <dimen name="about_text_padding">100dp</dimen>
+    <dimen name="about_text_padding">50dp</dimen>
 </resources>
