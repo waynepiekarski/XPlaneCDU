@@ -97,6 +97,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
 
         cduImage.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            Log.d(Const.TAG, "Layout change: $left, $top, $right, $bottom")
             Log.d(Const.TAG, "CDU raw image = ${cduImage.getDrawable().intrinsicWidth}x${cduImage.getDrawable().intrinsicHeight}")
             Log.d(Const.TAG, "CDU scaled image = ${cduImage.width}x${cduImage.height}")
             val scaleX = cduImage.width / cduImage.getDrawable().intrinsicWidth.toFloat()
@@ -130,7 +131,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             var validFontSize = -1.0f
             var validSet = false
             while (true) {
-                Log.d(Const.TAG, "Attempting to test font size $fontSize to exceed height $pixelHeight")
+                // Log.d(Const.TAG, "Attempting to test font size $fontSize to exceed height $pixelHeight")
                 var totalHeight = 0
                 // val fontRatio = getResources().getDimension(R.dimen.cdu_label_to_large_ratio)
                 for (entry in Definitions.CDULinesZibo737) {
@@ -149,7 +150,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     if (!entry.value.small) // Small overlaps with large, don't add it to the total
                         totalHeight += tv.getMeasuredHeight() + lp.topMargin + lp.bottomMargin // Include negative margins
                 }
-                Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
+                // Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
                 if (validSet) {
                     // Search is done, and we reapplied the last fitting font size
                     Log.d(Const.TAG, "The search for a fitting font is done and applied $fontSize")
@@ -176,12 +177,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 terminalTextSmall1.setTextScaleX(scaleXSmall)
                 terminalTextSmall1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextSmall1.getMeasuredWidth()
-                Log.d(Const.TAG, "After X scale $scaleXSmall received width $width for small lines, expecting $pixelWidth")
+                // Log.d(Const.TAG, "After X scale $scaleXSmall received width $width for small lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
                     scaleXSmall += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXSmall -= scaleStep
+                    Log.d(Const.TAG, "Found X scale $scaleXSmall for small lines, expecting $pixelWidth")
                     break
                 }
             }
@@ -190,12 +192,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 terminalTextLarge1.setTextScaleX(scaleXLarge)
                 terminalTextLarge1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextLarge1.getMeasuredWidth()
-                Log.d(Const.TAG, "After X scale $scaleXLarge received width $width for large lines, expecting $pixelWidth")
+                // Log.d(Const.TAG, "After X scale $scaleXLarge received width $width for large lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
                     scaleXLarge += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXLarge -= scaleStep
+                    Log.d(Const.TAG, "Found X scale $scaleXLarge for large lines, expecting $pixelWidth")
                     break
                 }
             }
@@ -204,12 +207,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 terminalLabel1.setTextScaleX(scaleXLabel)
                 terminalLabel1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalLabel1.getMeasuredWidth()
-                Log.d(Const.TAG, "After X scale $scaleXLabel received width $width for label lines, expecting $pixelWidth")
+                // Log.d(Const.TAG, "After X scale $scaleXLabel received width $width for label lines, expecting $pixelWidth")
                 if (width < pixelWidth) {
                     scaleXLabel += scaleStep
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXLabel -= scaleStep
+                    Log.d(Const.TAG, "Found X scale $scaleXLabel for label lines, expecting $pixelWidth")
                     break
                 }
             }

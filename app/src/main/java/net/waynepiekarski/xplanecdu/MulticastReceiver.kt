@@ -48,12 +48,13 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
         thread(start = true) {
             while(!cancelled) {
                 var packetCount = 0
-                Log.d(Const.TAG, "Receiving multicast packets for address $address on port $port")
+                Log.d(Const.TAG, "Requesting multicast packets for address $address on port $port")
                 try {
                     socket = MulticastSocket(port)
                     // Only block for 1 second before trying again, allows us to check for if cancelled
                     socket.soTimeout = 1000
                     socket.joinGroup(InetAddress.getByName(address))
+                    Log.d(Const.TAG, "Ready for multicast packets for address $address on port $port")
 
                     val buffer = ByteArray(64 * 1024) // UDP maximum is 64kb
                     val packet = DatagramPacket(buffer, buffer.size)
