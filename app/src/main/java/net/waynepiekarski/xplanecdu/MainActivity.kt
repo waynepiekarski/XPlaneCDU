@@ -51,6 +51,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var overlayLightExec = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(Const.TAG, "onCreate()")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -354,6 +355,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     }
 
     fun resetDisplay() {
+        Log.d(Const.TAG, "resetDisplay()")
         for (entry in Definitions.CDULinesZibo737) {
             val tv = entry.value.getTextView(this)
             if (entry.value.small)      tv.setText(padString24(brackets=false))
@@ -390,6 +392,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     }
 
     private fun restartNetworking() {
+        Log.d(Const.TAG, "restartNetworking()")
         resetDisplay()
         connectText.setText("Waiting for X-Plane BECN broadcast")
         connectAddress = null
@@ -409,6 +412,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     }
 
     override fun onPause() {
+        Log.d(Const.TAG, "onPause()")
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "onPause(): Cancelling existing TCP connection")
             tcp_extplane!!.stopListener()
@@ -420,6 +424,11 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             becn_listener = null
         }
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        Log.d(Const.TAG, "onDestroy()")
+        super.onDestroy()
     }
 
     override fun onNetworkFailure() {
