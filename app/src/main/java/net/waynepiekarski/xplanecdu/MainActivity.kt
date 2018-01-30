@@ -237,6 +237,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 else                        tv.setTextScaleX(scaleXLarge)
             }
 
+            // Purge the cached views in CDULinesZibo737 because they might be different if the app is destroyed,
+            // which can happen if the back button is pressed.
+            for (entry in Definitions.CDULinesZibo737) {
+                entry.value.nullTextView()
+            }
+
             // Create a transparent overlay to draw key outlines and also any other indicators
             val bitmapDrawable = cduImage.getDrawable() as BitmapDrawable
             sourceBitmap = bitmapDrawable.getBitmap()

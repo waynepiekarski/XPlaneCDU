@@ -35,12 +35,16 @@ object Definitions {
 
     class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false, var label: Boolean = false) {
 
-        private var view: TextView? = null
+        private var cachedView: TextView? = null
 
         fun getTextView(activity: Activity): TextView {
-            if (view == null)
-                view = activity.findViewById(viewId)
-            return view!!
+            if (cachedView == null)
+                cachedView = activity.findViewById(viewId)
+            return cachedView!!
+        }
+
+        fun nullTextView() {
+            cachedView = null
         }
     }
 
