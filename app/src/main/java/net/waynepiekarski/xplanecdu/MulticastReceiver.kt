@@ -101,6 +101,12 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
     fun stopListener() {
         Log.d(Const.TAG, "Stopping multicast listener and closing socket")
         cancelled = true
-        socket.close()
+        if (::socket.isInitialized) {
+            try {
+                socket.close()
+            } catch (e: IOException) {
+                Log.d(Const.TAG, "Closing multicast socket in stopListener caused IOException, this is probably ok")
+            }
+        }
     }
 }
