@@ -55,6 +55,11 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // It is very important to clear the CDU lines cache. If you don't, then it keeps TextViews
+        // around from before the user pressed the back button, but they are no longer valid. When
+        // you resume, the memory is still from before, but the layout is re-inflated with new views.
+        Definitions.nullOnCreateCDULines()
+
         aboutText.text = aboutText.getText().toString().replace("__VERSION__", "v" + BuildConfig.VERSION_NAME + " " + BuildConfig.VERSION_CODE + " " + BuildConfig.BUILD_TYPE)
 
         // Reset the text display to known 24 column text so the layout pass can work correctly
@@ -241,12 +246,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 if (entry.value.small)      tv.setTextScaleX(scaleXSmall)
                 else if (entry.value.label) tv.setTextScaleX(scaleXLabel)
                 else                        tv.setTextScaleX(scaleXLarge)
-            }
-
-            // Purge the cached views in CDULinesZibo737 because they might be different if the app is destroyed,
-            // which can happen if the back button is pressed.
-            for (entry in Definitions.CDULinesZibo737) {
-                entry.value.nullTextView()
             }
 
             // Create a transparent overlay to draw key outlines and also any other indicators

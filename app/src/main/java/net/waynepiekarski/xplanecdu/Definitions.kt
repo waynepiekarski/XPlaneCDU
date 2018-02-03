@@ -33,18 +33,22 @@ object Definitions {
         var illuminate: Boolean = false
     }
 
+    // Purge the cached views in CDULinesZibo737 because they are different if the app is re-created
+    // after the back button is pressed. The layout is reinflated but the previous cache is still around.
+    fun nullOnCreateCDULines() {
+        for (entry in CDULinesZibo737) {
+            entry.value.cachedView = null
+        }
+    }
+
     class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false, var green: Boolean = false, var magenta: Boolean = false, var label: Boolean = false) {
 
-        private var cachedView: TextView? = null
+        var cachedView: TextView? = null
 
         fun getTextView(activity: Activity): TextView {
             if (cachedView == null)
                 cachedView = activity.findViewById(viewId)
             return cachedView!!
-        }
-
-        fun nullTextView() {
-            cachedView = null
         }
     }
 
