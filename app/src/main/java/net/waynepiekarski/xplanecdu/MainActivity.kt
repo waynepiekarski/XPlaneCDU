@@ -48,7 +48,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private lateinit var overlayCanvas: Canvas
     private lateinit var sourceBitmap: Bitmap
     private var overlayOutlines = false
-    private var overlayLightExec = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(Const.TAG, "onCreate()")
@@ -143,7 +142,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             while (true) {
                 // Log.d(Const.TAG, "Attempting to test font size $fontSize to exceed height $pixelHeight")
                 var totalHeight = 0
-                // val fontRatio = getResources().getDimension(R.dimen.cdu_label_to_large_ratio)
                 for (entry in Definitions.CDULinesZibo737) {
                     val tv = entry.value.getTextView(this)
                     if (tv.text.length != 24)
