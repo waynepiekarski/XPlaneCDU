@@ -323,7 +323,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     fun sendCommand(cmnd: String) {
         // Send the command on a separate thread
         thread(start = true) {
-            if (tcp_extplane != null) {
+            if ((tcp_extplane != null) && connectWorking) {
                 tcp_extplane!!.writeln("cmd once $cmnd")
             } else {
                 Log.d(Const.TAG, "Ignoring command $cmnd since TCP connection is not available")
