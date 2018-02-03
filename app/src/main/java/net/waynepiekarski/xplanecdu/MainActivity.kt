@@ -447,9 +447,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onDestroy()
     }
 
-    override fun onNetworkFailure() {
+    override fun onFailureMulticast() {
         Log.d(Const.TAG, "Received indication the network is not ready, cannot open socket")
         connectText.setText("No network available, cannot listen for X-Plane")
+    }
+
+    override fun onTimeoutMulticast() {
+        Log.d(Const.TAG, "Received indication the multicast socket is not getting replies, will restart it and wait again")
+        connectText.setText("Timeout waiting for X-Plane BECN broadcast")
     }
 
     override fun onReceiveMulticast(buffer: ByteArray, source: InetAddress) {

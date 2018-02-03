@@ -39,8 +39,9 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
     private var lastAddress: InetAddress? = null
 
     interface OnReceiveMulticast {
-        fun onNetworkFailure()
         fun onReceiveMulticast(buffer: ByteArray, source: InetAddress)
+        fun onFailureMulticast()
+        fun onTimeoutMulticast()
     }
 
     init {
@@ -48,6 +49,8 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
         thread(start = true) {
             while(!cancelled) {
                 var packetCount = 0
+                var timeoutCount = 0
+                val restart = false
                 Log.d(Const.TAG, "Requesting multicast packets for address $address on port $port")
                 try {
                     socket = MulticastSocket(port)
@@ -74,14 +77,22 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
                                 Handler(Looper.getMainLooper()).post { callback.onReceiveMulticast(copyData, copyAddress) }
                             }
                         } catch (e: SocketTimeoutException) {
-                            Log.d(Const.TAG, "Timeout, reading again ...");
+                            timeoutCount++
+                            if (timeoutCount >= 5) {
+                                Log.d(Const.TAG, "Multicast socket has not received anything in 5 retries, breaking out of socket loop")
+                                break
+                            } else {
+                                Log.d(Const.TAG, "Timeout $timeoutCount, reading again ...")
+                            }
                         } catch (e: IOException) {
-                            Log.e(Const.TAG, "Failed to read packet " + e)
+                            Log.e(Const.TAG, "Failed to read packet, breaking out of socket loop: " + e)
+                            break
                         } catch (e: Exception) {
-                            Log.e(Const.TAG, "Unknown exception " + e)
+                            Log.e(Const.TAG, "Unknown exception, breaking out of socket loop: " + e)
+                            break
                         }
                     }
-                    Log.d(Const.TAG, "Thread is cancelled, closing down multicast listener on port " + port)
+                    Log.d(Const.TAG, "Socket while loop escaped, closing down multicast listener on port " + port)
                     socket.close()
                 } catch (e: SocketException) {
                     Log.e(Const.TAG, "Failed to open socket " + e)
@@ -89,7 +100,10 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
 
                 if (!cancelled) {
                     Log.d(Const.TAG, "Socket has failed but not cancelled, so sleeping and trying again")
-                    Handler(Looper.getMainLooper()).post { callback.onNetworkFailure() }
+                    if (timeoutCount == 0)
+                        Handler(Looper.getMainLooper()).post { callback.onFailureMulticast() }
+                    else
+                        Handler(Looper.getMainLooper()).post { callback.onTimeoutMulticast() }
                     Thread.sleep(1000)
                 }
             }
