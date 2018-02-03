@@ -45,6 +45,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var tcp_extplane: TCPClient? = null
     private var connectAddress: String? = null
     private var connectWorking = false
+    private var connectShutdown = false
     private lateinit var overlayCanvas: Canvas
     private lateinit var sourceBitmap: Bitmap
     private var overlayOutlines = false
@@ -404,6 +405,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     override fun onResume() {
         super.onResume()
         Log.d(Const.TAG, "onResume()")
+        connectShutdown = false
         restartNetworking()
     }
 
@@ -423,12 +425,17 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             becn_listener!!.stopListener()
             becn_listener = null
         }
-        Log.d(Const.TAG, "Starting X-Plane BECN listener")
-        becn_listener = MulticastReceiver(Const.BECN_ADDRESS, Const.BECN_PORT, this)
+        if (connectShutdown) {
+            Log.d(Const.TAG, "Will not restart BECN listener since connectShutdown is set")
+        } else {
+            Log.d(Const.TAG, "Starting X-Plane BECN listener since connectShutdown is not set")
+            becn_listener = MulticastReceiver(Const.BECN_ADDRESS, Const.BECN_PORT, this)
+        }
     }
 
     override fun onPause() {
         Log.d(Const.TAG, "onPause()")
+        connectShutdown = true // Prevent new BECN listeners starting up in restartNetworking
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "onPause(): Cancelling existing TCP connection")
             tcp_extplane!!.stopListener()
