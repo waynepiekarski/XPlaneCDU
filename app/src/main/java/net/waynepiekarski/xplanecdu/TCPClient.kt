@@ -57,9 +57,13 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
 
     fun writeln(str: String) {
         Log.d(Const.TAG, "Writing to TCP socket: [$str]")
-        bufferedWriter.write(str)
-        bufferedWriter.write("\n")
-        bufferedWriter.flush()
+        try {
+            bufferedWriter.write(str + "\n")
+            bufferedWriter.flush()
+        } catch (e: IOException) {
+            Log.d(Const.TAG, "Failed to write [%str] to TCP socket with exception $e")
+            stopListener()
+        }
     }
 
     private fun closeBuffers() {
