@@ -184,7 +184,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             val scaleStep = 0.01f
             val scaleInitial = 0.05f
             var scaleXSmall = scaleInitial
+            var scaleAttempts = 0
             while (true) {
+                scaleAttempts++
                 terminalTextSmall1.setTextScaleX(scaleXSmall)
                 terminalTextSmall1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextSmall1.getMeasuredWidth()
@@ -194,12 +196,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXSmall -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXSmall for small lines, expecting $pixelWidth")
+                    Log.d(Const.TAG, "Found X scale $scaleXSmall for small lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
                     break
                 }
             }
             var scaleXLarge = scaleInitial
+            scaleAttempts = 0
             while (true) {
+                scaleAttempts++
                 terminalTextLarge1.setTextScaleX(scaleXLarge)
                 terminalTextLarge1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalTextLarge1.getMeasuredWidth()
@@ -209,12 +213,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXLarge -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXLarge for large lines, expecting $pixelWidth")
+                    Log.d(Const.TAG, "Found X scale $scaleXLarge for large lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
                     break
                 }
             }
             var scaleXLabel = scaleInitial
+            scaleAttempts = 0
             while (true) {
+                scaleAttempts++
                 terminalLabel1.setTextScaleX(scaleXLabel)
                 terminalLabel1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                 val width = terminalLabel1.getMeasuredWidth()
@@ -224,7 +230,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 } else {
                     // Search is done, we exceeded the constraints so revert back one step
                     scaleXLabel -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXLabel for label lines, expecting $pixelWidth")
+                    Log.d(Const.TAG, "Found X scale $scaleXLabel for label lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
                     break
                 }
             }
