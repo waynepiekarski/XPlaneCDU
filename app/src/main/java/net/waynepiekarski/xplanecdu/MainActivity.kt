@@ -146,6 +146,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 // val fontRatio = getResources().getDimension(R.dimen.cdu_label_to_large_ratio)
                 for (entry in Definitions.CDULinesZibo737) {
                     val tv = entry.value.getTextView(this)
+                    if (tv.text.length != 24)
+                        Log.e(Const.TAG, "Detected string with invalid length [${tv.text}] in ${entry.key}")
                     val scale = if (entry.value.small)
                         Definitions.displaySmallRatio
                     else if (entry.value.label)
@@ -511,7 +513,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$fixed]")
                 } else {
                     val view = entry.getTextView(this)
-                    view.setText(fixed)
+                    // Always pad to 24 chars so the terminal is always ready to be re-laid out
+                    view.text = padString24(fixed)
                 }
             } else if (tokens[0] == "ud") {
                 val number = tokens[2].toFloat()
