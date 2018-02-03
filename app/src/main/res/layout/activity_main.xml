@@ -82,6 +82,38 @@
         android:typeface="monospace" />
 
     <TextView
+        android:id="@+id/terminalTextGreen0"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer0"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:layout_weight="1"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="PAGE TITLE 1234567891234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta0"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer0"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:layout_weight="1"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="PAGE TITLE 1234567891234"
+        android:textColor="@color/cdu_magenta_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
         android:id="@+id/terminalTextSmall0"
         android:layout_marginTop="@dimen/cdu_small_margin"
         android:layout_marginBottom="@dimen/cdu_small_margin"
@@ -135,6 +167,51 @@
         android:textScaleX="@dimen/cdu_large_text_scale_x"
         android:text="LARGE1 89012345678901234"
         android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextLargeInv1"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE1I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextGreen1"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE1I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta1"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel1"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE1I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
         android:textSize="@dimen/cdu_large_text_font_size"
         android:typeface="monospace" />
 
@@ -196,6 +273,51 @@
         android:typeface="monospace" />
 
     <TextView
+        android:id="@+id/terminalTextGreen2"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE2I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta2"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE2I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextLargeInv2"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel2"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE2I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
         android:id="@+id/terminalTextSmall2"
         android:layout_marginTop="@dimen/cdu_small_margin"
         android:layout_marginBottom="@dimen/cdu_small_margin"
@@ -249,6 +371,51 @@
         android:textScaleX="@dimen/cdu_large_text_scale_x"
         android:text="LARGE3 89012345678901234"
         android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextLargeInv3"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE3I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextGreen3"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE3I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta3"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel3"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE3I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
         android:textSize="@dimen/cdu_large_text_font_size"
         android:typeface="monospace" />
 
@@ -310,6 +477,51 @@
         android:typeface="monospace" />
 
     <TextView
+        android:id="@+id/terminalTextLargeInv4"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE4I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextGreen4"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE4I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta4"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel4"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE4I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
         android:id="@+id/terminalTextSmall4"
         android:layout_marginTop="@dimen/cdu_small_margin"
         android:layout_marginBottom="@dimen/cdu_small_margin"
@@ -363,6 +575,51 @@
         android:textScaleX="@dimen/cdu_large_text_scale_x"
         android:text="LARGE5 89012345678901234"
         android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextLargeInv5"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE5I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextGreen5"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE5I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta5"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel5"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE5I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
         android:textSize="@dimen/cdu_large_text_font_size"
         android:typeface="monospace" />
 
@@ -424,6 +681,51 @@
         android:typeface="monospace" />
 
     <TextView
+        android:id="@+id/terminalTextLargeInv6"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE6I 9012345678901234"
+        android:textColor="@color/cdu_inverse_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextGreen6"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE6I 9012345678901234"
+        android:textColor="@color/cdu_green_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextMagenta6"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalLabel6"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LARGE6I 9012345678901234"
+        android:textColor="@color/cdu_magenta_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
         android:id="@+id/terminalTextSmall6"
         android:layout_marginTop="@dimen/cdu_small_margin"
         android:layout_marginBottom="@dimen/cdu_small_margin"
@@ -462,6 +764,21 @@
         android:textScaleX="@dimen/cdu_large_text_scale_x"
         android:text="LINE ENTRY 2345678901234"
         android:textColor="@color/cdu_large_text_color"
+        android:textSize="@dimen/cdu_large_text_font_size"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/terminalTextLargeInv7"
+        android:layout_marginTop="@dimen/cdu_large_margin"
+        android:layout_marginBottom="@dimen/cdu_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/terminalSpacer7"
+        android:layout_toRightOf="@+id/leftPaddingDisplay"
+        android:background="@color/cdu_text_background"
+        android:textScaleX="@dimen/cdu_large_text_scale_x"
+        android:text="LINE ENTRY INV 678901234"
+        android:textColor="@color/cdu_inverse_text_color"
         android:textSize="@dimen/cdu_large_text_font_size"
         android:typeface="monospace" />
 

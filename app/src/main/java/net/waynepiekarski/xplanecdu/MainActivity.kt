@@ -145,8 +145,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 var totalHeight = 0
                 // val fontRatio = getResources().getDimension(R.dimen.cdu_label_to_large_ratio)
                 for (entry in Definitions.CDULinesZibo737) {
-                    if (entry.value.inverse)
-                        continue // Skip inverse values, they are duplicates or the normal large ones
                     val tv = entry.value.getTextView(this)
                     val scale = if (entry.value.small)
                         Definitions.displaySmallRatio
@@ -157,7 +155,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     tv.setTextSize(fontSize * scale)
                     tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
                     val lp = tv.getLayoutParams() as RelativeLayout.LayoutParams
-                    if (!entry.value.small) // Small overlaps with large, don't add it to the total
+                    // Don't add to the total anything that overlaps with large
+                    if (!entry.value.small && !entry.value.inverse && !entry.value.green && !entry.value.magenta)
                         totalHeight += tv.getMeasuredHeight() + lp.topMargin + lp.bottomMargin // Include negative margins
                 }
                 // Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
@@ -354,9 +353,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     fun resetDisplayDebug() {
         for (entry in Definitions.CDULinesZibo737) {
             val tv = entry.value.getTextView(this)
-            if (entry.value.small)      tv.setText("SMALL-789012345678901234")
-            else if (entry.value.label) tv.setText("LABEL-789012345678901234")
-            else                        tv.setText("LARGE-789012345678901234")
+            if (entry.value.label)        tv.setText("LabelLabelLabelLabelLabe")
+            else if (entry.value.small)   tv.setText("S    S    S    S    S   ")
+            else if (entry.value.inverse) tv.setText(" I    I    I    I    I  ")
+            else if (entry.value.green)   tv.setText("  G    G    G    G    G ")
+            else if (entry.value.magenta) tv.setText("   M    M    M    M    M")
+            else                          tv.setText("    L    L    L    L    ")
         }
     }
 
@@ -364,10 +366,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         Log.d(Const.TAG, "resetDisplay()")
         for (entry in Definitions.CDULinesZibo737) {
             val tv = entry.value.getTextView(this)
-            if (entry.value.small)      tv.setText(padString24(brackets=false))
-            if (entry.value.small)      tv.setText(padString24(brackets=false))
-            else if (entry.value.label) tv.setText(padString24(brackets=true))
-            else                        tv.setText(padString24(brackets=true))
+            if (entry.value.inverse)      tv.setText(padString24(brackets=false))
+            else if (entry.value.green)   tv.setText(padString24(brackets=false))
+            else if (entry.value.magenta) tv.setText(padString24(brackets=false))
+            else if (entry.value.small)   tv.setText(padString24(brackets=false))
+            else if (entry.value.label)   tv.setText(padString24(brackets=true))
+            else                          tv.setText(padString24(brackets=true))
         }
         terminalTextLarge3.setText(centerString24("XPlaneCDU", brackets=true))
         terminalLabel4.setText(centerString24("waiting", brackets=true))
@@ -507,11 +511,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$fixed]")
                 } else {
                     val view = entry.getTextView(this)
-                    if (entry.inverse) {
-                        Log.d(Const.TAG, "Ignoring _I inverted message, not sure what [ ] means right now")
-                    } else {
-                        view.setText(fixed)
-                    }
+                    view.setText(fixed)
                 }
             } else if (tokens[0] == "ud") {
                 val number = tokens[2].toFloat()
