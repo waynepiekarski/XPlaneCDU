@@ -5,9 +5,6 @@
     <!-- Need to listen to UDP datagrams -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Need to learn the IP address used for the WiFi network adapter -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/zibo_737_cdu"
