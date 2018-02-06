@@ -50,7 +50,6 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
             while(!cancelled) {
                 var packetCount = 0
                 var timeoutCount = 0
-                val restart = false
                 Log.d(Const.TAG, "Requesting multicast packets for address $address on port $port")
                 try {
                     socket = MulticastSocket(port)

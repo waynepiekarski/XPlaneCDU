@@ -274,7 +274,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         // Illuminate the exec light if active
         val exec = Definitions.CDUButtonsZibo737["laminar/B738/indicators/fmc_exec_lights"]!!
-        if (exec!!.illuminate) {
+        if (exec.illuminate) {
             val paint = Paint()
             paint.color = Color.YELLOW
             paint.style = Paint.Style.FILL
@@ -474,7 +474,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         check(tcp_extplane == null)
         Log.d(Const.TAG, "Making connection to $connectAddress:${Const.TCP_EXTPLANE_PORT}")
-        tcp_extplane = TCPClient(source!!, Const.TCP_EXTPLANE_PORT, this)
+        tcp_extplane = TCPClient(source, Const.TCP_EXTPLANE_PORT, this)
     }
 
     override fun onConnectTCP() {
