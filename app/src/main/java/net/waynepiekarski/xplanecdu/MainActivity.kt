@@ -36,7 +36,12 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.InetAddress
 import kotlin.concurrent.thread
-
+import android.widget.EditText
+import android.app.AlertDialog
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import java.net.UnknownHostException
 
 
 class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnReceiveMulticast {
@@ -44,6 +49,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var becn_listener: MulticastReceiver? = null
     private var tcp_extplane: TCPClient? = null
     private var connectAddress: String? = null
+    private var manualAddress: String = ""
+    private var manualInetAddress: InetAddress? = null
     private var connectWorking = false
     private var connectShutdown = false
     private lateinit var overlayCanvas: Canvas
@@ -75,7 +82,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         // Reset the text display to known 24 column text so the layout pass can work correctly
         resetDisplay()
-        Toast.makeText(this, "Click the panel screws to bring up help and usage information, ", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Click the panel screws to bring up help and usage information.\nClick the connection text to specify a manual hostname.", Toast.LENGTH_LONG).show()
 
         cduImage.setOnTouchListener { _view, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_UP) {
@@ -278,6 +285,62 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             // Refresh the overlay for the first time
             refreshOverlay()
         }
+
+        connectText.setOnClickListener { popupManualHostname() }
+    }
+
+    // The user can click on the connectText and specify a X-Plane hostname manually
+    private fun changeManualHostname(hostname: String) {
+        if (hostname.isEmpty()) {
+            Log.d(Const.TAG, "Clearing override X-Plane hostname for automatic mode, saving to prefs, restarting networking")
+            manualAddress = hostname
+            val sharedPref = getPreferences(Context.MODE_PRIVATE)
+            with(sharedPref.edit()){
+                putString("manual_address", manualAddress)
+                commit()
+            }
+            restartNetworking()
+        } else {
+            Log.d(Const.TAG, "Setting override X-Plane hostname to $manualAddress")
+            // Lookup the IP address on a background thread
+            thread(start = true) {
+                try {
+                    manualInetAddress = InetAddress.getByName(hostname)
+                } catch (e: UnknownHostException) {
+                    // IP address was not valid, so ask for another one and exit this thread
+                    Handler(Looper.getMainLooper()).post { popupManualHostname(error=true) }
+                    return@thread
+                }
+
+                // We got a valid IP address, so we can now restart networking on the UI thread
+                Handler(Looper.getMainLooper()).post {
+                    manualAddress = hostname
+                    Log.d(Const.TAG, "Converted manual X-Plane hostname [$manualAddress] to ${manualInetAddress}, saving to prefs, restarting networking")
+                    val sharedPref = getPreferences(Context.MODE_PRIVATE)
+                    with(sharedPref.edit()) {
+                        putString("manual_address", manualAddress)
+                        commit()
+                    }
+                    restartNetworking()
+                }
+            }
+        }
+    }
+
+    private fun popupManualHostname(error: Boolean = false) {
+        val builder = AlertDialog.Builder(this)
+        if (error)
+            builder.setTitle("Invalid entry! Specify X-Plane hostname or IP")
+        else
+            builder.setTitle("Specify X-Plane hostname or IP")
+
+        val input = EditText(this)
+        input.setText(manualAddress)
+        builder.setView(input)
+        builder.setPositiveButton("Manual Override") { dialog, which -> changeManualHostname(input.text.toString()) }
+        builder.setNegativeButton("Revert") { dialog, which -> dialog.cancel() }
+        builder.setNeutralButton("Automatic Multicast") { dialog, which -> changeManualHostname("") }
+        builder.show()
     }
 
     fun refreshOverlay() {
@@ -424,13 +487,20 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onResume()
         Log.d(Const.TAG, "onResume()")
         connectShutdown = false
-        restartNetworking()
+
+        // Retrieve the manual address from shared preferences
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        val prefAddress = sharedPref.getString("manual_address", "")
+        Log.d(Const.TAG, "Found preferences value for manual_address = [$prefAddress]")
+
+        // Pass on whatever this string is, and will end up calling restartNetworking()
+        changeManualHostname(prefAddress)
     }
 
     private fun restartNetworking() {
         Log.d(Const.TAG, "restartNetworking()")
         resetDisplay()
-        connectText.setText("Waiting for X-Plane BECN broadcast")
+        connectText.setText("Closing down network connections")
         connectAddress = null
         connectWorking = false
         if (tcp_extplane != null) {
@@ -446,8 +516,18 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         if (connectShutdown) {
             Log.d(Const.TAG, "Will not restart BECN listener since connectShutdown is set")
         } else {
-            Log.d(Const.TAG, "Starting X-Plane BECN listener since connectShutdown is not set")
-            becn_listener = MulticastReceiver(Const.BECN_ADDRESS, Const.BECN_PORT, this)
+            if (manualAddress.isEmpty()) {
+                connectText.setText("Waiting for X-Plane BECN broadcast")
+                Log.d(Const.TAG, "Starting X-Plane BECN listener since connectShutdown is not set")
+                becn_listener = MulticastReceiver(Const.BECN_ADDRESS, Const.BECN_PORT, this)
+            } else {
+                Log.d(Const.TAG, "Manual address $manualAddress specified, skipping any auto-detection")
+                check(tcp_extplane == null)
+                connectAddress = manualAddress
+                connectText.setText("Creating manual connection to $connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                Log.d(Const.TAG, "Making manual direct connection to $connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                tcp_extplane = TCPClient(manualInetAddress!!, Const.TCP_EXTPLANE_PORT, this)
+            }
         }
     }
 
@@ -499,16 +579,19 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     override fun onConnectTCP() {
         // We will wait for EXTPLANE 1 in onReceiveTCP, so ignore this
         Log.d(Const.TAG, "Connected to ExtPlane, now waiting for welcome message")
-        connectText.setText("Found X-Plane, waiting for ExtPlane plugin")
+        connectText.setText("Found X-Plane at $connectAddress:${Const.TCP_EXTPLANE_PORT}, waiting for ExtPlane")
     }
 
     override fun onDisconnectTCP() {
-        // Connection has closed down, reset the UI
-        Log.d(Const.TAG, "onDisconnectTCP(): Closing down TCP connection to wait for new BECN")
+        Log.d(Const.TAG, "onDisconnectTCP(): Closing down TCP connection and will restart")
         restartNetworking()
     }
 
     override fun onReceiveTCP(line: String) {
+        // If the connection is closed, ignore any queued up Handlers that might be in-progress
+        if (tcp_extplane == null)
+            return
+
         if (line == "EXTPLANE 1") {
             Log.d(Const.TAG, "Found ExtPlane welcome message, will now make requests")
             connectText.setText("Received EXTPLANE from $connectAddress:${Const.TCP_EXTPLANE_PORT}")

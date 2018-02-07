@@ -61,7 +61,7 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
             bufferedWriter.write(str + "\n")
             bufferedWriter.flush()
         } catch (e: IOException) {
-            Log.d(Const.TAG, "Failed to write [%str] to TCP socket with exception $e")
+            Log.d(Const.TAG, "Failed to write [$str] to TCP socket with exception $e")
             stopListener()
         }
     }

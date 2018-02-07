@@ -806,6 +806,8 @@ Requirements:\n
 \n
 Note that you cannot use the existing ExtPlane v1 binaries because they have bugs related to string datarefs.\n
 \n
+If multi-cast is not working, you can tap on the connection text to configure a manual X-Plane hostname.\n
+\n
 See https://github.com/waynepiekarski/ExtPlane for more info about my ExtPlane plugin, which is forked from https://github.com/vranki/ExtPlane"
         android:textColor="@color/about_text_color"
         android:textSize="@dimen/about_text_size"
