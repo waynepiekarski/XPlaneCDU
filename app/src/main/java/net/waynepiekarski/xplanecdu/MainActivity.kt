@@ -53,6 +53,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var manualInetAddress: InetAddress? = null
     private var connectWorking = false
     private var connectShutdown = false
+    private var connectFailures = 0
     private lateinit var overlayCanvas: Canvas
     private lateinit var sourceBitmap: Bitmap
     private var overlayOutlines = false
@@ -78,11 +79,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         lastLayoutBottom = -1
 
         // Add the compiled-in BuildConfig values to the about text
-        aboutText.text = aboutText.getText().toString().replace("__VERSION__", "v" + BuildConfig.VERSION_NAME + " " + BuildConfig.VERSION_CODE + " " + BuildConfig.BUILD_TYPE)
+        aboutText.text = aboutText.getText().toString().replace("__VERSION__", "v" + Const.getBuildVersion() + " " + Const.getBuildId() + " " + BuildConfig.BUILD_TYPE + "\nBuild date: " + Const.getBuildDateTime())
 
         // Reset the text display to known 24 column text so the layout pass can work correctly
         resetDisplay()
         Toast.makeText(this, "Click the panel screws to bring up help and usage information.\nClick the connection text to specify a manual hostname.", Toast.LENGTH_LONG).show()
+
+        // Miscellaneous counters that also need reset
+        connectFailures = 0
 
         cduImage.setOnTouchListener { _view, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_UP) {
@@ -105,6 +109,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         Log.d(Const.TAG, "Found click matches to key ${entry.key}")
                         if (entry.value.light) {
                             // Do not handle clicks within lights, they are not buttons
+                        } else if (entry.key.startsWith("internal_hostname")) {
+                            // Pop up the host name changer for this item type
+                            popupManualHostname()
                         } else if (entry.key.startsWith("internal_help")) {
                             // One of the many help buttons were pressed, they all map to the same action
                             if (aboutText.visibility == View.VISIBLE) {
@@ -420,6 +427,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
 
     fun padString24(str: String = "", brackets: Boolean = false): String {
+        val limit = if(brackets) 22 else 24
+        check(str.length <= limit) { "Input string [$str] exceeds limit $limit" }
         if (brackets)
             return String.format("<%-22s>", str)
         else
@@ -497,10 +506,21 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         changeManualHostname(prefAddress)
     }
 
+    private fun setConnectionStatus(str: String, dest: String? = null) {
+        Log.d(Const.TAG, "Changing connection status to [$str] with destination [$dest]")
+        var out = str
+        if (dest != null)
+            out += "\n$dest"
+        if (connectFailures > 0)
+            out += "\nError #$connectFailures"
+
+        connectText.text = out
+    }
+
     private fun restartNetworking() {
         Log.d(Const.TAG, "restartNetworking()")
         resetDisplay()
-        connectText.setText("Closing down network connections")
+        setConnectionStatus("Closing down network connections")
         connectAddress = null
         connectWorking = false
         if (tcp_extplane != null) {
@@ -517,15 +537,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             Log.d(Const.TAG, "Will not restart BECN listener since connectShutdown is set")
         } else {
             if (manualAddress.isEmpty()) {
-                connectText.setText("Waiting for X-Plane BECN broadcast")
+                setConnectionStatus("Waiting for X-Plane BECN broadcast")
                 Log.d(Const.TAG, "Starting X-Plane BECN listener since connectShutdown is not set")
                 becn_listener = MulticastReceiver(Const.BECN_ADDRESS, Const.BECN_PORT, this)
             } else {
                 Log.d(Const.TAG, "Manual address $manualAddress specified, skipping any auto-detection")
                 check(tcp_extplane == null)
                 connectAddress = manualAddress
-                connectText.setText("Creating manual connection to $connectAddress:${Const.TCP_EXTPLANE_PORT}")
-                Log.d(Const.TAG, "Making manual direct connection to $connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("Creating manual connection", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 tcp_extplane = TCPClient(manualInetAddress!!, Const.TCP_EXTPLANE_PORT, this)
             }
         }
@@ -555,22 +574,22 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     override fun onFailureMulticast(ref: MulticastReceiver) {
         if (ref != becn_listener)
             return
-        Log.d(Const.TAG, "Received indication the network is not ready, cannot open socket")
-        connectText.setText("No network available, cannot listen for X-Plane")
+        connectFailures++
+        setConnectionStatus("No network available, cannot listen for X-Plane")
     }
 
     override fun onTimeoutMulticast(ref: MulticastReceiver) {
         if (ref != becn_listener)
             return
         Log.d(Const.TAG, "Received indication the multicast socket is not getting replies, will restart it and wait again")
-        connectText.setText("Timeout waiting for X-Plane BECN broadcast")
+        connectFailures++
+        setConnectionStatus("Timeout waiting for X-Plane BECN broadcast")
     }
 
     override fun onReceiveMulticast(buffer: ByteArray, source: InetAddress, ref: MulticastReceiver) {
         if (ref != becn_listener)
             return
-        Log.d(Const.TAG, "Received BECN multicast packet from $source")
-        connectText.setText("Received BECN: " + source.getHostAddress())
+        setConnectionStatus("Received multicast BECN", source.getHostAddress())
         connectAddress = source.toString().replace("/","")
 
         // The BECN listener will only reply once, so close it down and open the TCP connection
@@ -585,15 +604,15 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     override fun onConnectTCP(tcpRef: TCPClient) {
         if (tcpRef != tcp_extplane)
             return
-        // We will wait for EXTPLANE 1 in onReceiveTCP, so ignore this
-        Log.d(Const.TAG, "Connected to ExtPlane, now waiting for welcome message")
-        connectText.setText("Found X-Plane at $connectAddress:${Const.TCP_EXTPLANE_PORT}, waiting for ExtPlane")
+        // We will wait for EXTPLANE 1 in onReceiveTCP, so don't send the requests just yet
+        setConnectionStatus("Found X-Plane, waiting for ExtPlane", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
     }
 
     override fun onDisconnectTCP(tcpRef: TCPClient) {
         if (tcpRef != tcp_extplane)
             return
         Log.d(Const.TAG, "onDisconnectTCP(): Closing down TCP connection and will restart")
+        connectFailures++
         restartNetworking()
     }
 
@@ -604,8 +623,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             return
 
         if (line == "EXTPLANE 1") {
-            Log.d(Const.TAG, "Found ExtPlane welcome message, will now make requests")
-            connectText.setText("Received EXTPLANE from $connectAddress:${Const.TCP_EXTPLANE_PORT}")
+            Log.d(Const.TAG, "Found ExtPlane welcome message, will now make subscription requests")
+            setConnectionStatus("Received EXTPLANE, sending subs", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
             // Make requests for CDU values on a separate thread
             thread(start = true) {
@@ -625,7 +644,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             // Log.d(Const.TAG, "Received TCP line [$line]")
             if (!connectWorking) {
                 // Everything is working with actual data coming back
-                connectText.setText("X-Plane at $connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                connectFailures = 0
+                setConnectionStatus("X-Plane CDU working", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
             }
 

@@ -27,4 +27,27 @@ object Const {
     val TCP_EXTPLANE_PORT = 51000
     val BECN_PORT = 49707
     val BECN_ADDRESS = "239.255.1.1"
+
+    fun getBuildId(): Int { return BuildConfig.VERSION_CODE }
+    fun getBuildVersion(): String { return BuildConfig.VERSION_NAME }
+
+    private var _datetime: String? = null
+    fun getBuildDateTime(): String {
+        if (_datetime != null)
+            return _datetime!!
+        // Convert integer value YYMMDDHHMM into string
+        var c = getBuildId()
+        val min = c % 100
+        c /= 100
+        val hrs = c % 100
+        c /= 100
+        val day = c % 100
+        c /= 100
+        val monthStr = arrayOf("N/A", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
+        val mon = monthStr[c % 100]
+        c /= 100
+        val year = c
+        _datetime = "20%02d-%s-%02d %02d:%02d".format(year, mon, day, hrs, min)
+        return _datetime!!
+    }
 }

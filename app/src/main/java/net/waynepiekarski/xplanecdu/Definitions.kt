@@ -72,6 +72,8 @@ object Definitions {
             "internal_help_5" to CDUButton("internal_help",   0, 948,  52, 1074, "HELP5"),
             "internal_help_6" to CDUButton("internal_help", 630, 947, 683, 1073, "HELP6"),
 
+            "internal_hostname" to CDUButton("internal_hostname", displayXLeft.toInt(), displayYTop.toInt(), displayXRight.toInt(), displayYBottom.toInt(), "AUTO/MANUAL CONNECT"),
+
             "laminar/B738/button/fmc1_1L" to CDUButton("FMC captain 1LSK", 6, 116, 52, 151, "1L"),
             "laminar/B738/button/fmc1_2L" to CDUButton("FMC captain 2LSK", 6, 170, 52, 205, "2L"),
             "laminar/B738/button/fmc1_3L" to CDUButton("FMC captain 3LSK", 6, 225, 52, 258, "3L"),
