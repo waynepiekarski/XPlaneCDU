@@ -791,24 +791,25 @@
         android:layout_below="@+id/connectText"
         android:background="@drawable/about"
         android:padding="@dimen/about_text_padding"
-        android:text="X P l a n e C D U   -   __VERSION__\n
-Android CDU for X-Plane 11\n\n
-Copyright (C) 2018 - Wayne Piekarski\n
-http://www.waynepiekarski.net\n\n
-Licensed under the GNU Public License v3\n
-Source code available from\n
-https://github.com/waynepiekarski/XPlaneCDU\n\n
-Requirements:\n
-- Pre-compiled ExtPlane v2 plugin from http://waynepiekarski.net/ExtPlane\n
-- X-Plane 11\n
-- Zibo's Boeing 738\n
-- Open TCP port 51000 for ExtPlane\n
+        android:text="X P l a n e C D U  -  Android CDU for X-Plane 11
+\n\n__VERSION__
+\nCopyright (C) 2018 - Wayne Piekarski
+\nhttp://www.waynepiekarski.net
+\n\nRequirements:
+\n- X-Plane 11
+\n- Download ExtPlane v2 plugin from http://waynepiekarski.net/ExtPlane and unzip into the Resources/Plugins directory
+\n- Zibo's Boeing 738
+\n- Open TCP port 51000 in Windows firewall for ExtPlane
+\n- Multicast support on your network for auto-detection
 \n
-Note that you cannot use the existing ExtPlane v1 binaries because they have bugs related to string datarefs.\n
+\nNote that you cannot use the original ExtPlane v1 binaries because they have bugs related to string datarefs.
 \n
-If multi-cast is not working, you can tap on the connection text to configure a manual X-Plane hostname.\n
+\nIf multi-cast is not working, you can tap on the connection text or the CDU screen to configure a manual X-Plane hostname or IP address.
 \n
-See https://github.com/waynepiekarski/ExtPlane for more info about my ExtPlane plugin, which is forked from https://github.com/vranki/ExtPlane"
+\nXPlaneCDU is licensed under the GNU Public License v3
+\nSource code available from https://github.com/waynepiekarski/XPlaneCDU
+\n
+\nExtPlane v2 plugin is also GPLv3, source at https://github.com/waynepiekarski/ExtPlane and forked from https://github.com/vranki/ExtPlane"
         android:textColor="@color/about_text_color"
         android:textSize="@dimen/about_text_size"
         android:visibility="gone" />
