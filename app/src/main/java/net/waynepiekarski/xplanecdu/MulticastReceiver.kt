@@ -33,15 +33,16 @@ import java.net.*
 import kotlin.concurrent.thread
 
 
-class MulticastReceiver (address: String, port: Int, internal var callback: OnReceiveMulticast) {
+class MulticastReceiver (private var address: String, private var port: Int, private var callback: OnReceiveMulticast) {
     private lateinit var socket: MulticastSocket
     @Volatile private var cancelled = false
     private var lastAddress: InetAddress? = null
+    private val timeoutLimitSeconds = 5 // Number of seconds before we give up and restart the socket
 
     interface OnReceiveMulticast {
-        fun onReceiveMulticast(buffer: ByteArray, source: InetAddress)
-        fun onFailureMulticast()
-        fun onTimeoutMulticast()
+        fun onReceiveMulticast(buffer: ByteArray, source: InetAddress, ref: MulticastReceiver)
+        fun onFailureMulticast(ref: MulticastReceiver)
+        fun onTimeoutMulticast(ref: MulticastReceiver)
     }
 
     init {
@@ -73,15 +74,15 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
                                 lastAddress = packet.address
                                 val copyAddress = packet.address // This uses a mutex and cannot be done within a UI handler
                                 val copyData = Arrays.copyOfRange(buffer, 0, packet.length)
-                                Handler(Looper.getMainLooper()).post { callback.onReceiveMulticast(copyData, copyAddress) }
+                                Handler(Looper.getMainLooper()).post { callback.onReceiveMulticast(copyData, copyAddress, this) }
                             }
                         } catch (e: SocketTimeoutException) {
                             timeoutCount++
-                            if (timeoutCount >= 5) {
-                                Log.d(Const.TAG, "Multicast socket has not received anything in 5 retries, breaking out of socket loop")
+                            if (timeoutCount >= timeoutLimitSeconds) {
+                                Log.d(Const.TAG, "Multicast socket has not received anything in $timeoutLimitSeconds seconds, breaking out of socket loop")
                                 break
                             } else {
-                                Log.d(Const.TAG, "Timeout $timeoutCount, reading again ...")
+                                Log.d(Const.TAG, "Multicast timeout $timeoutCount sec of $timeoutLimitSeconds sec, reading again ...")
                             }
                         } catch (e: IOException) {
                             Log.e(Const.TAG, "Failed to read packet, breaking out of socket loop: " + e)
@@ -100,9 +101,9 @@ class MulticastReceiver (address: String, port: Int, internal var callback: OnRe
                 if (!cancelled) {
                     Log.d(Const.TAG, "Socket has failed but not cancelled, so sleeping and trying again")
                     if (timeoutCount == 0)
-                        Handler(Looper.getMainLooper()).post { callback.onFailureMulticast() }
+                        Handler(Looper.getMainLooper()).post { callback.onFailureMulticast(this) }
                     else
-                        Handler(Looper.getMainLooper()).post { callback.onTimeoutMulticast() }
+                        Handler(Looper.getMainLooper()).post { callback.onTimeoutMulticast(this) }
                     Thread.sleep(1000)
                 }
             }

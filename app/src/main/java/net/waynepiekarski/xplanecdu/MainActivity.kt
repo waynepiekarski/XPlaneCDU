@@ -119,7 +119,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         } else if (entry.key.startsWith("laminar/")) {
                             // Regular button press
                             Log.d(Const.TAG, "Need to send command ${entry.key} for ${entry.value.label}")
-                            sendCommand(entry.key)
+                            sendCommand(tcp_extplane, entry.key)
                         } else {
                             Log.w(Const.TAG, "Unknown command ${entry.key} for ${entry.value.label} - ignored")
                         }
@@ -407,11 +407,11 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
     }
 
-    fun sendCommand(cmnd: String) {
+    private fun sendCommand(tcpRef: TCPClient?, cmnd: String) {
         // Send the command on a separate thread
         thread(start = true) {
-            if ((tcp_extplane != null) && connectWorking) {
-                tcp_extplane!!.writeln("cmd once $cmnd")
+            if ((tcpRef != null) && (tcpRef == tcp_extplane) && connectWorking) {
+                tcpRef.writeln("cmd once $cmnd")
             } else {
                 Log.d(Const.TAG, "Ignoring command $cmnd since TCP connection is not available")
             }
@@ -552,17 +552,23 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onDestroy()
     }
 
-    override fun onFailureMulticast() {
+    override fun onFailureMulticast(ref: MulticastReceiver) {
+        if (ref != becn_listener)
+            return
         Log.d(Const.TAG, "Received indication the network is not ready, cannot open socket")
         connectText.setText("No network available, cannot listen for X-Plane")
     }
 
-    override fun onTimeoutMulticast() {
+    override fun onTimeoutMulticast(ref: MulticastReceiver) {
+        if (ref != becn_listener)
+            return
         Log.d(Const.TAG, "Received indication the multicast socket is not getting replies, will restart it and wait again")
         connectText.setText("Timeout waiting for X-Plane BECN broadcast")
     }
 
-    override fun onReceiveMulticast(buffer: ByteArray, source: InetAddress) {
+    override fun onReceiveMulticast(buffer: ByteArray, source: InetAddress, ref: MulticastReceiver) {
+        if (ref != becn_listener)
+            return
         Log.d(Const.TAG, "Received BECN multicast packet from $source")
         connectText.setText("Received BECN: " + source.getHostAddress())
         connectAddress = source.toString().replace("/","")
@@ -576,20 +582,25 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         tcp_extplane = TCPClient(source, Const.TCP_EXTPLANE_PORT, this)
     }
 
-    override fun onConnectTCP() {
+    override fun onConnectTCP(tcpRef: TCPClient) {
+        if (tcpRef != tcp_extplane)
+            return
         // We will wait for EXTPLANE 1 in onReceiveTCP, so ignore this
         Log.d(Const.TAG, "Connected to ExtPlane, now waiting for welcome message")
         connectText.setText("Found X-Plane at $connectAddress:${Const.TCP_EXTPLANE_PORT}, waiting for ExtPlane")
     }
 
-    override fun onDisconnectTCP() {
+    override fun onDisconnectTCP(tcpRef: TCPClient) {
+        if (tcpRef != tcp_extplane)
+            return
         Log.d(Const.TAG, "onDisconnectTCP(): Closing down TCP connection and will restart")
         restartNetworking()
     }
 
-    override fun onReceiveTCP(line: String) {
-        // If the connection is closed, ignore any queued up Handlers that might be in-progress
-        if (tcp_extplane == null)
+    override fun onReceiveTCP(line: String, tcpRef: TCPClient) {
+        // If the current connection does not match the incoming reference, it is out of date and should be ignored.
+        // This is important otherwise we will try to transmit on the wrong socket, fail, and then try to restart.
+        if (tcpRef != tcp_extplane)
             return
 
         if (line == "EXTPLANE 1") {
@@ -598,15 +609,15 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
             // Make requests for CDU values on a separate thread
             thread(start = true) {
-                tcp_extplane!!.writeln("sub sim/aircraft/view/acf_descrip")
+                tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
                 for (entry in Definitions.CDULinesZibo737) {
                     // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
-                    tcp_extplane!!.writeln("sub " + entry.key)
+                    tcpRef.writeln("sub " + entry.key)
                 }
                 for (entry in Definitions.CDUButtonsZibo737) {
                     if (entry.value.light) {
                         Log.d(Const.TAG, "Requesting illuminated status key=" + entry.key + " value=" + entry.value.description)
-                        tcp_extplane!!.writeln("sub " + entry.key)
+                        tcpRef.writeln("sub " + entry.key)
                     }
                 }
             }
@@ -647,7 +658,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         Log.d(Const.TAG, "Found non-light name [${tokens[1]}] with value [$number]")
                     }
                 }
-
             } else {
                 Log.e(Const.TAG, "Unknown encoding type [${tokens[0]}] for name [${tokens[1]}]")
             }

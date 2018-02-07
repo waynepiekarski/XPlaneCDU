@@ -31,7 +31,7 @@ import kotlin.concurrent.thread
 import java.io.*
 
 
-class TCPClient (var address: InetAddress, var port: Int, internal var callback: OnTCPEvent) {
+class TCPClient (private var address: InetAddress, private var port: Int, private var callback: OnTCPEvent) {
     private lateinit var socket: Socket
     @Volatile private var cancelled = false
     private lateinit var bufferedWriter: BufferedWriter
@@ -40,9 +40,9 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
     private lateinit var outputStreamWriter: OutputStreamWriter
 
     interface OnTCPEvent {
-        fun onReceiveTCP(line: String)
-        fun onConnectTCP()
-        fun onDisconnectTCP()
+        fun onReceiveTCP(line: String, tcpRef: TCPClient)
+        fun onConnectTCP(tcpRef: TCPClient)
+        fun onDisconnectTCP(tcpRef: TCPClient)
     }
 
     fun stopListener() {
@@ -56,6 +56,10 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
     }
 
     fun writeln(str: String) {
+        if (cancelled) {
+            Log.d(Const.TAG, "Skipping write to cancelled socket: [$str]")
+            return
+        }
         Log.d(Const.TAG, "Writing to TCP socket: [$str]")
         try {
             bufferedWriter.write(str + "\n")
@@ -93,7 +97,7 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
             socket = Socket(address, port)
         } catch (e: Exception) {
             Log.e(Const.TAG, "Failed to connect to $address:$port with exception $e")
-            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
             return
         }
 
@@ -106,12 +110,12 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
         } catch (e: IOException) {
             Log.e(Const.TAG, "Exception while opening socket buffers $e")
             closeBuffers()
-            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
             return
         }
 
         // Connection should be established, everything is ready to read and write
-        Handler(Looper.getMainLooper()).post { callback.onConnectTCP() }
+        Handler(Looper.getMainLooper()).post { callback.onConnectTCP(this) }
 
         // Start reading from the socket, any writes happen from another thread
         while (!cancelled) {
@@ -127,7 +131,7 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
                 cancelled = true
             } else {
                 Log.d(Const.TAG, "TCP returned line [$line]")
-                Handler(Looper.getMainLooper()).post { callback.onReceiveTCP(line) }
+                Handler(Looper.getMainLooper()).post { callback.onReceiveTCP(line, this) }
             }
         }
 
@@ -135,7 +139,7 @@ class TCPClient (var address: InetAddress, var port: Int, internal var callback:
         closeBuffers()
 
         // The connection is gone, tell the listener in case they need to update the UI
-        Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP() }
+        Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
     }
 
     // Constructor starts a new thread to handle the blocking outbound connection
