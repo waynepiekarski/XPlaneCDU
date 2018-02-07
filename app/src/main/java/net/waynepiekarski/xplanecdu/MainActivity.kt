@@ -49,6 +49,10 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private lateinit var overlayCanvas: Canvas
     private lateinit var sourceBitmap: Bitmap
     private var overlayOutlines = false
+    private var lastLayoutLeft   = -1
+    private var lastLayoutTop    = -1
+    private var lastLayoutRight  = -1
+    private var lastLayoutBottom = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(Const.TAG, "onCreate()")
@@ -60,6 +64,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         // you resume, the memory is still from before, but the layout is re-inflated with new views.
         Definitions.nullOnCreateCDULines()
 
+        // Also important to reset the layout cache, for the same reason as the CDU lines cache
+        lastLayoutLeft   = -1
+        lastLayoutTop    = -1
+        lastLayoutRight  = -1
+        lastLayoutBottom = -1
+
+        // Add the compiled-in BuildConfig values to the about text
         aboutText.text = aboutText.getText().toString().replace("__VERSION__", "v" + BuildConfig.VERSION_NAME + " " + BuildConfig.VERSION_CODE + " " + BuildConfig.BUILD_TYPE)
 
         // Reset the text display to known 24 column text so the layout pass can work correctly
@@ -112,6 +123,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
 
         cduImage.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            if ((lastLayoutLeft == left) && (lastLayoutTop == top) && (lastLayoutRight == right) && (lastLayoutBottom == bottom)) {
+                Log.d(Const.TAG, "Skipping layout change since it is identical to current layout")
+                return@addOnLayoutChangeListener
+            }
+            lastLayoutLeft = left
+            lastLayoutTop = top
+            lastLayoutRight = right
+            lastLayoutBottom = bottom
             Log.d(Const.TAG, "Layout change: $left, $top, $right, $bottom")
             Log.d(Const.TAG, "CDU raw image = ${cduImage.getDrawable().intrinsicWidth}x${cduImage.getDrawable().intrinsicHeight}")
             Log.d(Const.TAG, "CDU scaled image = ${cduImage.width}x${cduImage.height}")
