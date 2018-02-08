@@ -51,6 +51,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var connectAddress: String? = null
     private var manualAddress: String = ""
     private var manualInetAddress: InetAddress? = null
+    private var connectZibo = false
     private var connectWorking = false
     private var connectShutdown = false
     private var connectFailures = 0
@@ -542,6 +543,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         setConnectionStatus("Closing down network", "", "Wait a few seconds")
         connectAddress = null
         connectWorking = false
+        connectZibo = false
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
             tcp_extplane!!.stopListener()
@@ -662,10 +664,11 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
             if (!connectWorking) {
+                check(!connectZibo) { "connectZibo should not be set if connectWorking is not set" }
                 // Everything is working with actual data coming back.
                 // This is the last time we can put debug text on the CDU before it is overwritten
                 connectFailures = 0
-                setConnectionStatus("X-Plane CDU started", "Check aircraft type", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("X-Plane CDU starting", "Check aircraft type", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
             }
 
@@ -683,6 +686,11 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     val view = entry.getTextView(this)
                     // Always pad to 24 chars so the terminal is always ready to be re-laid out
                     view.text = padString24(fixed)
+                    // If this is the first time we found a Zibo CDU dataref, then update the UI
+                    if (!connectZibo) {
+                        setConnectionStatus("X-Plane CDU working", "", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                        connectZibo = true
+                    }
                 }
             } else if (tokens[0] == "ud") {
                 val number = tokens[2].toFloat()
