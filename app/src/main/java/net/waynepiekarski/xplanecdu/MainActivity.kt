@@ -52,6 +52,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var manualAddress: String = ""
     private var manualInetAddress: InetAddress? = null
     private var connectZibo = false
+    private var connectActNotes: String = ""
     private var connectWorking = false
     private var connectShutdown = false
     private var connectFailures = 0
@@ -544,6 +545,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectAddress = null
         connectWorking = false
         connectZibo = false
+        connectActNotes = ""
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
             tcp_extplane!!.stopListener()
@@ -644,22 +646,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             return
 
         if (line == "EXTPLANE 1") {
-            Log.d(Const.TAG, "Found ExtPlane welcome message, will now make subscription requests")
-            setConnectionStatus("Received EXTPLANE", "Sending subscribe", "Wait a few seconds", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+            Log.d(Const.TAG, "Found ExtPlane welcome message, will now make subscription requests for aircraft info")
+            setConnectionStatus("Received EXTPLANE", "Sending acf subscribe", "Start your flight", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
-            // Make requests for CDU values on a separate thread
+            // Make requests for aircraft type messages so we can detect when the Zibo 738 is available,
+            // the datarefs do not exist until the aircraft is loaded and in use
             thread(start = true) {
                 tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
-                for (entry in Definitions.CDULinesZibo737) {
-                    // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
-                    tcpRef.writeln("sub " + entry.key)
-                }
-                for (entry in Definitions.CDUButtonsZibo737) {
-                    if (entry.value.light) {
-                        Log.d(Const.TAG, "Requesting illuminated status key=" + entry.key + " value=" + entry.value.description)
-                        tcpRef.writeln("sub " + entry.key)
-                    }
-                }
+                tcpRef.writeln("sub sim/aircraft/view/acf_notes")
             }
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
@@ -681,12 +675,46 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
                 val entry = Definitions.CDULinesZibo737[tokens[1]]
                 if (entry == null) {
-                    Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with string [$fixed]")
+                    // We have received either acf_notes or acf_descrip, so we need to see if the
+                    // aircraft has changed, and if Zibo is available for us to subscribe to.
+                    if (tokens[1] == "sim/aircraft/view/acf_notes") {
+                        if (decoded != connectActNotes) {
+                            // The aircraft name has actually changed from before
+                            if (decoded.toLowerCase().startsWith("zibomod")) {
+                                setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+
+                                // The aircraft has changed to the Zibo 738, so start the subscription process
+                                thread(start = true) {
+                                    Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is running")
+                                    for (entry in Definitions.CDULinesZibo737) {
+                                        // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
+                                        tcpRef.writeln("sub " + entry.key)
+                                    }
+                                    for (entry in Definitions.CDUButtonsZibo737) {
+                                        if (entry.value.light) {
+                                            Log.d(Const.TAG, "Requesting illuminated status key=" + entry.key + " value=" + entry.value.description)
+                                            tcpRef.writeln("sub " + entry.key)
+                                        }
+                                    }
+                                }
+                            } else {
+                                // The aircraft changed to something non-Zibo, so reset the CDU and wait for a new aircraft
+                                connectZibo = false
+                                resetDisplay()
+                                setConnectionStatus("Waiting for Zibo 738", "Non-Zibo detected", "Change to Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                            }
+                            connectActNotes = decoded
+                        } else {
+                            Log.d(Const.TAG, "acf_notes updated, but no change from previous [$connectActNotes]")
+                        }
+                    } else {
+                        Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$fixed]")
+                    }
                 } else {
                     val view = entry.getTextView(this)
                     // Always pad to 24 chars so the terminal is always ready to be re-laid out
                     view.text = padString24(fixed)
-                    // If this is the first time we found a Zibo CDU dataref, then update the UI
+                    // If this is the first time we found a Zibo CDU dataref, then update the UI, this is the final step!
                     if (!connectZibo) {
                         setConnectionStatus("X-Plane CDU working", "", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                         connectZibo = true
