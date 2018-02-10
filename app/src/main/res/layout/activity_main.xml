@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/mainLayout"
+    android:keepScreenOn="true"
     tools:context="net.waynepiekarski.xplanecdu.MainActivity">
 
     <ImageView
