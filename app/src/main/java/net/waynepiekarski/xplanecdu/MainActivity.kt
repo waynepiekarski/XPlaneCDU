@@ -41,6 +41,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.view.SoundEffectConstants
 import java.net.UnknownHostException
 
 
@@ -129,6 +130,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             // Regular button press
                             Log.d(Const.TAG, "Need to send command ${entry.key} for ${entry.value.label}")
                             sendCommand(tcp_extplane, entry.key)
+
+                            // Play sound effect on button press
+                            cduImage.playSoundEffect(SoundEffectConstants.CLICK);
                         } else {
                             Log.w(Const.TAG, "Unknown command ${entry.key} for ${entry.value.label} - ignored")
                         }
