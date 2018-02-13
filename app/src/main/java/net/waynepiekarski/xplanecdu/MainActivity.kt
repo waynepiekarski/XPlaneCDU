@@ -42,6 +42,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.view.SoundEffectConstants
 import java.net.UnknownHostException
 
@@ -350,6 +351,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         val input = EditText(this)
         input.setText(manualAddress)
+        input.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
         builder.setView(input)
         builder.setPositiveButton("Manual Override") { dialog, which -> changeManualHostname(input.text.toString()) }
         builder.setNegativeButton("Revert") { dialog, which -> dialog.cancel() }
