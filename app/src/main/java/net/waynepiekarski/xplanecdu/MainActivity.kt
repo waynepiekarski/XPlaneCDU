@@ -419,6 +419,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 }
             }
         }
+
+        // Notify the ImageView about the latest bitmap change
+        cduHelp.invalidate()
     }
 
     private fun sendCommand(tcpRef: TCPClient?, cmnd: String) {
