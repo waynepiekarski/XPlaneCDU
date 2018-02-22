@@ -22,8 +22,6 @@
 
 package net.waynepiekarski.xplanecdu
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 
 import java.io.IOException
@@ -74,7 +72,7 @@ class MulticastReceiver (private var address: String, private var port: Int, pri
                                 lastAddress = packet.address
                                 val copyAddress = packet.address // This uses a mutex and cannot be done within a UI handler
                                 val copyData = Arrays.copyOfRange(buffer, 0, packet.length)
-                                Handler(Looper.getMainLooper()).post { callback.onReceiveMulticast(copyData, copyAddress, this) }
+                                MainActivity.doUiThread { callback.onReceiveMulticast(copyData, copyAddress, this) }
                             }
                         } catch (e: SocketTimeoutException) {
                             timeoutCount++
@@ -101,9 +99,9 @@ class MulticastReceiver (private var address: String, private var port: Int, pri
                 if (!cancelled) {
                     Log.d(Const.TAG, "Socket has failed but not cancelled, so sleeping and trying again")
                     if (timeoutCount == 0)
-                        Handler(Looper.getMainLooper()).post { callback.onFailureMulticast(this) }
+                        MainActivity.doUiThread { callback.onFailureMulticast(this) }
                     else
-                        Handler(Looper.getMainLooper()).post { callback.onTimeoutMulticast(this) }
+                        MainActivity.doUiThread { callback.onTimeoutMulticast(this) }
                     Thread.sleep(1000)
                 }
             }

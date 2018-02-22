@@ -22,8 +22,6 @@
 
 package net.waynepiekarski.xplanecdu
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 
 import java.net.*
@@ -97,7 +95,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
             socket = Socket(address, port)
         } catch (e: Exception) {
             Log.e(Const.TAG, "Failed to connect to $address:$port with exception $e")
-            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
+            MainActivity.doUiThread { callback.onDisconnectTCP(this) }
             return
         }
 
@@ -110,12 +108,12 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
         } catch (e: IOException) {
             Log.e(Const.TAG, "Exception while opening socket buffers $e")
             closeBuffers()
-            Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
+            MainActivity.doUiThread { callback.onDisconnectTCP(this) }
             return
         }
 
         // Connection should be established, everything is ready to read and write
-        Handler(Looper.getMainLooper()).post { callback.onConnectTCP(this) }
+        MainActivity.doUiThread { callback.onConnectTCP(this) }
 
         // Start reading from the socket, any writes happen from another thread
         while (!cancelled) {
@@ -131,7 +129,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
                 cancelled = true
             } else {
                 Log.d(Const.TAG, "TCP returned line [$line]")
-                Handler(Looper.getMainLooper()).post { callback.onReceiveTCP(line, this) }
+                MainActivity.doUiThread { callback.onReceiveTCP(line, this) }
             }
         }
 
@@ -139,7 +137,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
         closeBuffers()
 
         // The connection is gone, tell the listener in case they need to update the UI
-        Handler(Looper.getMainLooper()).post { callback.onDisconnectTCP(this) }
+        MainActivity.doUiThread { callback.onDisconnectTCP(this) }
     }
 
     // Constructor starts a new thread to handle the blocking outbound connection

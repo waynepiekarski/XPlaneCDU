@@ -26,7 +26,6 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
@@ -35,13 +34,10 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.InetAddress
-import kotlin.concurrent.thread
 import android.widget.EditText
 import android.app.AlertDialog
 import android.content.Context
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.text.InputType
 import android.view.SoundEffectConstants
 import java.net.UnknownHostException
@@ -304,6 +300,18 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectText.setOnClickListener { popupManualHostname() }
     }
 
+    companion object {
+        private var backgroundThread: HandlerThread? = null
+
+        fun doUiThread(code: () -> Unit) {
+            Handler(Looper.getMainLooper()).post { code() }
+        }
+
+        fun doBgThread(code: () -> Unit) {
+            Handler(backgroundThread!!.getLooper()).post { code() }
+        }
+    }
+
     // The user can click on the connectText and specify a X-Plane hostname manually
     private fun changeManualHostname(hostname: String) {
         if (hostname.isEmpty()) {
@@ -318,17 +326,17 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         } else {
             Log.d(Const.TAG, "Setting override X-Plane hostname to $manualAddress")
             // Lookup the IP address on a background thread
-            thread(start = true) {
+            doBgThread {
                 try {
                     manualInetAddress = InetAddress.getByName(hostname)
                 } catch (e: UnknownHostException) {
                     // IP address was not valid, so ask for another one and exit this thread
-                    Handler(Looper.getMainLooper()).post { popupManualHostname(error=true) }
-                    return@thread
+                    doUiThread { popupManualHostname(error=true) }
+                    return@doBgThread
                 }
 
                 // We got a valid IP address, so we can now restart networking on the UI thread
-                Handler(Looper.getMainLooper()).post {
+                doUiThread {
                     manualAddress = hostname
                     Log.d(Const.TAG, "Converted manual X-Plane hostname [$manualAddress] to ${manualInetAddress}, saving to prefs, restarting networking")
                     val sharedPref = getPreferences(Context.MODE_PRIVATE)
@@ -428,7 +436,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     private fun sendCommand(tcpRef: TCPClient?, cmnd: String) {
         // Send the command on a separate thread
-        thread(start = true) {
+        doBgThread {
             if ((tcpRef != null) && (tcpRef == tcp_extplane) && connectWorking) {
                 tcpRef.writeln("cmd once $cmnd")
             } else {
@@ -507,6 +515,10 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onResume()
         Log.d(Const.TAG, "onResume()")
         connectShutdown = false
+
+        // Start up our background processing thread
+        backgroundThread = HandlerThread("BackgroundThread")
+        backgroundThread!!.start()
 
         // Retrieve the manual address from shared preferences
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
@@ -597,6 +609,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             becn_listener!!.stopListener()
             becn_listener = null
         }
+        backgroundThread!!.quit()
         super.onPause()
     }
 
@@ -662,7 +675,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
             // Make requests for aircraft type messages so we can detect when the Zibo 738 is available,
             // the datarefs do not exist until the aircraft is loaded and in use
-            thread(start = true) {
+            doBgThread {
                 tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
                 tcpRef.writeln("sub sim/aircraft/view/acf_notes")
             }
@@ -695,7 +708,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
                                 // The aircraft has changed to the Zibo 738, so start the subscription process
-                                thread(start = true) {
+                                doBgThread {
                                     Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is running")
                                     for (entry in Definitions.CDULinesZibo737) {
                                         // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
