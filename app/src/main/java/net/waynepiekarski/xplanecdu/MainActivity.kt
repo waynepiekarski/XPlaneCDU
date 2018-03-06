@@ -590,7 +590,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 Log.d(Const.TAG, "Manual address $manualAddress specified, skipping any auto-detection")
                 check(tcp_extplane == null)
                 connectAddress = manualAddress
-                setConnectionStatus("Manual TCP connect", "", "Needs ExtPlane plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("Manual TCP connect", "Find ExtPlane plugin", "Check Win firewall", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 tcp_extplane = TCPClient(manualInetAddress!!, Const.TCP_EXTPLANE_PORT, this)
             }
         }
@@ -636,7 +636,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     override fun onReceiveMulticast(buffer: ByteArray, source: InetAddress, ref: MulticastReceiver) {
         if (ref != becn_listener)
             return
-        setConnectionStatus("Found BECN multicast", "", "Wait a few seconds", source.getHostAddress())
+        setConnectionStatus("Found BECN multicast", "Find ExtPlane plugin", "Check Win firewall", source.getHostAddress())
         connectAddress = source.toString().replace("/","")
 
         // The BECN listener will only reply once, so close it down and open the TCP connection
