@@ -95,6 +95,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
             socket = Socket(address, port)
         } catch (e: Exception) {
             Log.e(Const.TAG, "Failed to connect to $address:$port with exception $e")
+            Thread.sleep(Const.ERROR_NETWORK_SLEEP)
             MainActivity.doUiThread { callback.onDisconnectTCP(this) }
             return
         }
@@ -108,6 +109,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
         } catch (e: IOException) {
             Log.e(Const.TAG, "Exception while opening socket buffers $e")
             closeBuffers()
+            Thread.sleep(Const.ERROR_NETWORK_SLEEP)
             MainActivity.doUiThread { callback.onDisconnectTCP(this) }
             return
         }
@@ -137,6 +139,7 @@ class TCPClient (private var address: InetAddress, private var port: Int, privat
         closeBuffers()
 
         // The connection is gone, tell the listener in case they need to update the UI
+        Thread.sleep(Const.ERROR_NETWORK_SLEEP)
         MainActivity.doUiThread { callback.onDisconnectTCP(this) }
     }
 
