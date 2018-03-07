@@ -697,8 +697,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 val fixed = decoded.replace('`','\u00B0').replace('*','\u25CA')
 
                 Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
-                val entry = Definitions.CDULinesZibo737[tokens[1]]
-                if (entry == null) {
+                val lineEntry = Definitions.CDULinesZibo737[tokens[1]]
+                if (lineEntry == null) {
                     // We have received either acf_notes or acf_descrip, so we need to see if the
                     // aircraft has changed, and if Zibo is available for us to subscribe to.
                     if (tokens[1] == "sim/aircraft/view/acf_notes") {
@@ -735,7 +735,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$fixed]")
                     }
                 } else {
-                    val view = entry.getTextView(this)
+                    val view = lineEntry.getTextView(this)
                     // Always pad to 24 chars so the terminal is always ready to be re-laid out
                     view.text = padString24(fixed)
                     // If this is the first time we found a Zibo CDU dataref, then update the UI, this is the final step!
