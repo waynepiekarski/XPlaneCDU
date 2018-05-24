@@ -51,7 +51,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var manualAddress: String = ""
     private var manualInetAddress: InetAddress? = null
     private var connectZibo = false
-    private var connectActNotes: String = ""
+    private var connectActTailnum: String = ""
     private var connectWorking = false
     private var connectShutdown = false
     private var connectFailures = 0
@@ -530,7 +530,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     }
 
     private fun setConnectionStatus(line1: String, line2: String, fixup: String, dest: String? = null) {
-        Log.d(Const.TAG, "Changing connection status to [$line1][$line2] with destination [$dest]")
+        Log.d(Const.TAG, "Changing connection status to [$line1][$line2][$fixup] with destination [$dest]")
         var out = line1 + ". "
         if (line2.length > 0)
             out += "${line2}. "
@@ -568,7 +568,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectAddress = null
         connectWorking = false
         connectZibo = false
-        connectActNotes = ""
+        connectActTailnum = ""
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
             tcp_extplane!!.stopListener()
@@ -676,8 +676,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             // Make requests for aircraft type messages so we can detect when the Zibo 738 is available,
             // the datarefs do not exist until the aircraft is loaded and in use
             doBgThread {
-                tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
-                tcpRef.writeln("sub sim/aircraft/view/acf_notes")
+                tcpRef.writeln("sub sim/aircraft/view/acf_tailnum")
             }
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
@@ -699,12 +698,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
                 val lineEntry = Definitions.CDULinesZibo737[tokens[1]]
                 if (lineEntry == null) {
-                    // We have received either acf_notes or acf_descrip, so we need to see if the
-                    // aircraft has changed, and if Zibo is available for us to subscribe to.
-                    if (tokens[1] == "sim/aircraft/view/acf_notes") {
-                        if (decoded != connectActNotes) {
-                            // The aircraft name has actually changed from before
-                            if (decoded.toLowerCase().startsWith("zibomod")) {
+                    // We have received acf_tailnum, so the aircraft has changed, and this will indicate if it is a Zibo-variant aircraft
+                    if (tokens[1] == "sim/aircraft/view/acf_tailnum") {
+                        // Has the Zibo-state of the tailnum changed? If we switch from one variant to another, we should not redo the subscriptions
+                        // because it will reset the display while incoming changes are arriving.
+                        if (decoded.toLowerCase().contains("zb73") != connectActTailnum.toLowerCase().contains("zb73")) {
+                            // The aircraft tailnum has actually changed from before
+                            if (decoded.toLowerCase().contains("zb73")) {
                                 setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
                                 // The aircraft has changed to the Zibo 738, so start the subscription process
@@ -727,9 +727,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 resetDisplay()
                                 setConnectionStatus("Waiting for Zibo 738", "Non-Zibo detected", "Change to Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                             }
-                            connectActNotes = decoded
+                            connectActTailnum = decoded
                         } else {
-                            Log.d(Const.TAG, "acf_notes updated, but no change from previous [$connectActNotes]")
+                            Log.d(Const.TAG, "acf_tailnum updated, but no change from previous [$connectActTailnum]")
                         }
                     } else {
                         Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$fixed]")
