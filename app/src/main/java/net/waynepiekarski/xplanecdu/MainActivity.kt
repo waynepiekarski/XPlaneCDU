@@ -50,7 +50,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var connectAddress: String? = null
     private var manualAddress: String = ""
     private var manualInetAddress: InetAddress? = null
-    private var connectZibo = false
+    private var connectSupported = false
     private var connectActTailnum: String = ""
     private var connectWorking = false
     private var connectShutdown = false
@@ -62,6 +62,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var lastLayoutTop    = -1
     private var lastLayoutRight  = -1
     private var lastLayoutBottom = -1
+    private var lastLayoutColumns = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(Const.TAG, "onCreate()")
@@ -71,18 +72,20 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         // It is very important to clear the CDU lines cache. If you don't, then it keeps TextViews
         // around from before the user pressed the back button, but they are no longer valid. When
         // you resume, the memory is still from before, but the layout is re-inflated with new views.
-        Definitions.nullOnCreateCDULines()
+        Definitions.nullOnCreateCDULines(Definitions.CDULinesZibo737)
+        Definitions.nullOnCreateCDULines(Definitions.CDULinesSSG747)
 
         // Also important to reset the layout cache, for the same reason as the CDU lines cache
-        lastLayoutLeft   = -1
-        lastLayoutTop    = -1
-        lastLayoutRight  = -1
+        lastLayoutLeft = -1
+        lastLayoutTop = -1
+        lastLayoutRight = -1
         lastLayoutBottom = -1
+        lastLayoutColumns = -1
 
         // Add the compiled-in BuildConfig values to the about text
         aboutText.text = aboutText.getText().toString().replace("__VERSION__", "Version: " + Const.getBuildVersion() + " " + BuildConfig.BUILD_TYPE + " build " + Const.getBuildId() + " " + "\nBuild date: " + Const.getBuildDateTime())
 
-        // Reset the text display to known 24 column text so the layout pass can work correctly
+        // Reset the text display to known column text so the layout pass can work correctly
         resetDisplay()
         Toast.makeText(this, "Click the panel screws to bring up help and usage information.\nClick the terminal screen or connection status to specify a manual hostname.", Toast.LENGTH_LONG).show()
 
@@ -105,7 +108,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 }
 
                 // Find the click inside the definitions
-                for (entry in Definitions.CDUButtonsZibo737) {
+                for (entry in Definitions.buttons) {
                     if ((ix >= entry.value.x1) && (ix <= entry.value.x2) && (iy >= entry.value.y1) && (iy <= entry.value.y2)) {
                         Log.d(Const.TAG, "Found click matches to key ${entry.key}")
                         if (entry.value.light) {
@@ -124,15 +127,20 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 overlayOutlines = true
                                 refreshOverlay()
                             }
-                        } else if (entry.key.startsWith("laminar/")) {
-                            // Regular button press
-                            Log.d(Const.TAG, "Need to send command ${entry.key} for ${entry.value.label}")
-                            sendCommand(tcp_extplane, entry.key)
+                        } else if (entry.key.startsWith("internal_")) {
+                            Log.w(Const.TAG, "Unknown internal command ${entry.key} for ${entry.value.label} - ignored")
+                        } else {
+                            // Handle button presses, which can either be commands or changing dataref values
+                            if (entry.value.dataref) {
+                                Log.d(Const.TAG, "Need to set dataref ${entry.key} to 1.0 for ${entry.value.label}")
+                                setDataref(tcp_extplane, entry.key, 1.0f)
+                            } else {
+                                Log.d(Const.TAG, "Need to send command ${entry.key} for ${entry.value.label}")
+                                sendCommand(tcp_extplane, entry.key)
+                            }
 
                             // Play sound effect on button press
-                            cduImage.playSoundEffect(SoundEffectConstants.CLICK);
-                        } else {
-                            Log.w(Const.TAG, "Unknown command ${entry.key} for ${entry.value.label} - ignored")
+                            cduImage.playSoundEffect(SoundEffectConstants.CLICK)
                         }
                     }
                 }
@@ -141,7 +149,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
 
         cduImage.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            if ((lastLayoutLeft == left) && (lastLayoutTop == top) && (lastLayoutRight == right) && (lastLayoutBottom == bottom)) {
+            if ((lastLayoutLeft == left) && (lastLayoutTop == top) && (lastLayoutRight == right) && (lastLayoutBottom == bottom) && (lastLayoutColumns == Definitions.numColumns)) {
                 Log.d(Const.TAG, "Skipping layout change since it is identical to current layout")
                 return@addOnLayoutChangeListener
             }
@@ -149,155 +157,165 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             lastLayoutTop = top
             lastLayoutRight = right
             lastLayoutBottom = bottom
-            Log.d(Const.TAG, "Layout change: $left, $top, $right, $bottom")
-            Log.d(Const.TAG, "CDU raw image = ${cduImage.getDrawable().intrinsicWidth}x${cduImage.getDrawable().intrinsicHeight}")
-            Log.d(Const.TAG, "CDU scaled image = ${cduImage.width}x${cduImage.height}")
-            val scaleX = cduImage.width / cduImage.getDrawable().intrinsicWidth.toFloat()
-            val scaleY = cduImage.height / cduImage.getDrawable().intrinsicHeight.toFloat()
-
-            // Compute the dimensions of the text display in actual device pixels,
-            // since the CDU ImageView has been stretched to fit this
-            val pixelXLeft   = (Definitions.displayXLeft   * scaleX).toInt()
-            val pixelXRight  = (Definitions.displayXRight  * scaleX).toInt()
-            val pixelYTop    = (Definitions.displayYTop    * scaleY).toInt()
-            val pixelYBottom = (Definitions.displayYBottom * scaleY).toInt()
-            val pixelWidth   = pixelXRight - pixelXLeft
-            val pixelHeight  = pixelYBottom - pixelYTop
-
-            // Set the top and left padding in pixels according to where the text display starts
-            val lp1 = leftPaddingDisplay.getLayoutParams()
-            lp1.width = pixelXLeft
-            leftPaddingDisplay.setLayoutParams(lp1)
-            val lp2 = topPaddingDisplay.getLayoutParams()
-            lp2.height = pixelYTop
-            topPaddingDisplay.setLayoutParams(lp2)
-
-            // Adjust the about box to the correct width to fit only over the text display
-            val lp3 = aboutText.getLayoutParams()
-            lp3.width = pixelWidth
-            aboutText.setLayoutParams(lp3)
-
-            // Resize the font until everything exceeds the total height.
-            // The font is taller than wide, so we will not exceed the total width.
-            var fontSize = 1.0f
-            var validFontSize = -1.0f
-            var validSet = false
-            while (true) {
-                // Log.d(Const.TAG, "Attempting to test font size $fontSize to exceed height $pixelHeight")
-                var totalHeight = 0
-                for (entry in Definitions.CDULinesZibo737) {
-                    val tv = entry.value.getTextView(this)
-                    if (tv.text.length != 24)
-                        Log.e(Const.TAG, "Detected string with invalid length [${tv.text}] in ${entry.key}")
-                    val scale = if (entry.value.small)
-                        Definitions.displaySmallRatio
-                    else if (entry.value.label)
-                        Definitions.displayLabelRatio
-                    else
-                        Definitions.displayLargeRatio
-                    tv.setTextSize(fontSize * scale)
-                    tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                    val lp = tv.getLayoutParams() as RelativeLayout.LayoutParams
-                    // Don't add to the total anything that overlaps with large
-                    if (!entry.value.small && !entry.value.inverse && !entry.value.green && !entry.value.magenta)
-                        totalHeight += tv.getMeasuredHeight() + lp.topMargin + lp.bottomMargin // Include negative margins
-                }
-                // Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
-                if (validSet) {
-                    // Search is done, and we reapplied the last fitting font size
-                    Log.d(Const.TAG, "The search for a fitting font is done and applied $fontSize")
-                    break
-                } else if (totalHeight < pixelHeight) {
-                    validFontSize = fontSize
-                    fontSize += 0.5f // Android seems to only implement steps of 0.5
-                } else {
-                    // Done with the search, we need to back up one size now and reapply it
-                    validSet = true
-                    fontSize = validFontSize
-                    Log.d(Const.TAG, "Reversing back a fontSize to $fontSize and reapplying")
-                }
-            }
-            Log.d(Const.TAG, "Found fitting font size $validFontSize")
-
-            // Compute a suitable width for each line type (small, large, label)
-            // The step size needs to be small enough otherwise the rows won't all align, 0.02f fails
-            // Need to pick a small enough starting point, because 1.0 on some devices is too wide
-            val scaleStep = 0.01f
-            val scaleInitial = 0.05f
-            var scaleXSmall = scaleInitial
-            var scaleAttempts = 0
-            while (true) {
-                scaleAttempts++
-                terminalTextSmall1.setTextScaleX(scaleXSmall)
-                terminalTextSmall1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                val width = terminalTextSmall1.getMeasuredWidth()
-                // Log.d(Const.TAG, "After X scale $scaleXSmall received width $width for small lines, expecting $pixelWidth")
-                if (width < pixelWidth) {
-                    scaleXSmall += scaleStep
-                } else {
-                    // Search is done, we exceeded the constraints so revert back one step
-                    scaleXSmall -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXSmall for small lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
-                    break
-                }
-            }
-            var scaleXLarge = scaleInitial
-            scaleAttempts = 0
-            while (true) {
-                scaleAttempts++
-                terminalTextLarge1.setTextScaleX(scaleXLarge)
-                terminalTextLarge1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                val width = terminalTextLarge1.getMeasuredWidth()
-                // Log.d(Const.TAG, "After X scale $scaleXLarge received width $width for large lines, expecting $pixelWidth")
-                if (width < pixelWidth) {
-                    scaleXLarge += scaleStep
-                } else {
-                    // Search is done, we exceeded the constraints so revert back one step
-                    scaleXLarge -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXLarge for large lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
-                    break
-                }
-            }
-            var scaleXLabel = scaleInitial
-            scaleAttempts = 0
-            while (true) {
-                scaleAttempts++
-                terminalLabel1.setTextScaleX(scaleXLabel)
-                terminalLabel1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                val width = terminalLabel1.getMeasuredWidth()
-                // Log.d(Const.TAG, "After X scale $scaleXLabel received width $width for label lines, expecting $pixelWidth")
-                if (width < pixelWidth) {
-                    scaleXLabel += scaleStep
-                } else {
-                    // Search is done, we exceeded the constraints so revert back one step
-                    scaleXLabel -= scaleStep
-                    Log.d(Const.TAG, "Found X scale $scaleXLabel for label lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
-                    break
-                }
-            }
-
-            // Apply the final text sizes to all lines now
-            Log.d(Const.TAG, "Applying final text sizes to all lines now")
-            for (entry in Definitions.CDULinesZibo737) {
-                val tv = entry.value.getTextView(this)
-                if (entry.value.small)      tv.setTextScaleX(scaleXSmall)
-                else if (entry.value.label) tv.setTextScaleX(scaleXLabel)
-                else                        tv.setTextScaleX(scaleXLarge)
-            }
-
-            // Create a transparent overlay to draw key outlines and also any other indicators
-            val bitmapDrawable = cduImage.getDrawable() as BitmapDrawable
-            sourceBitmap = bitmapDrawable.getBitmap()
-            val bitmapNew = Bitmap.createBitmap(sourceBitmap.width, sourceBitmap.height, Bitmap.Config.ARGB_8888)
-            overlayCanvas = Canvas(bitmapNew)
-            Log.d(Const.TAG, "Adding overlay bitmap of size ${bitmapNew.width}x${bitmapNew.height}")
-            cduHelp.setImageBitmap(bitmapNew)
-
-            // Refresh the overlay for the first time
-            refreshOverlay()
+            lastLayoutColumns = Definitions.numColumns
+            layoutCduImage()
         }
 
         connectText.setOnClickListener { popupManualHostname() }
+    }
+
+    private fun changeCduImageColumns(columns: Int) {
+        lastLayoutColumns = columns
+    }
+
+    private fun layoutCduImage() {
+        Log.d(Const.TAG, "Layout change: $lastLayoutLeft, $lastLayoutTop, $lastLayoutRight, $lastLayoutBottom")
+        Log.d(Const.TAG, "Number of text columns = $lastLayoutColumns")
+        Log.d(Const.TAG, "CDU raw image = ${cduImage.getDrawable().intrinsicWidth}x${cduImage.getDrawable().intrinsicHeight}")
+        Log.d(Const.TAG, "CDU scaled image = ${cduImage.width}x${cduImage.height}")
+        val scaleX = cduImage.width / cduImage.getDrawable().intrinsicWidth.toFloat()
+        val scaleY = cduImage.height / cduImage.getDrawable().intrinsicHeight.toFloat()
+
+        // Compute the dimensions of the text display in actual device pixels,
+        // since the CDU ImageView has been stretched to fit this
+        val pixelXLeft   = (Definitions.displayXLeft   * scaleX).toInt()
+        val pixelXRight  = (Definitions.displayXRight  * scaleX).toInt()
+        val pixelYTop    = (Definitions.displayYTop    * scaleY).toInt()
+        val pixelYBottom = (Definitions.displayYBottom * scaleY).toInt()
+        val pixelWidth   = pixelXRight - pixelXLeft
+        val pixelHeight  = pixelYBottom - pixelYTop
+
+        // Set the top and left padding in pixels according to where the text display starts
+        val lp1 = leftPaddingDisplay.getLayoutParams()
+        lp1.width = pixelXLeft
+        leftPaddingDisplay.setLayoutParams(lp1)
+        val lp2 = topPaddingDisplay.getLayoutParams()
+        lp2.height = pixelYTop
+        topPaddingDisplay.setLayoutParams(lp2)
+
+        // Adjust the about box to the correct width to fit only over the text display
+        val lp3 = aboutText.getLayoutParams()
+        lp3.width = pixelWidth
+        aboutText.setLayoutParams(lp3)
+
+        // Resize the font until everything exceeds the total height.
+        // The font is taller than wide, so we will not exceed the total width.
+        var fontSize = 1.0f
+        var validFontSize = -1.0f
+        var validSet = false
+        while (true) {
+            // Log.d(Const.TAG, "Attempting to test font size $fontSize to exceed height $pixelHeight")
+            var totalHeight = 0
+            for (entry in Definitions.lines) {
+                val tv = entry.value.getTextView(this)
+                if (tv.text.length != Definitions.numColumns)
+                    Log.e(Const.TAG, "Detected string with invalid length [${tv.text}]=${tv.text.length} in ${entry.key} expected ${Definitions.numColumns}")
+                val scale = if (entry.value.small)
+                    Definitions.displaySmallRatio
+                else if (entry.value.label)
+                    Definitions.displayLabelRatio
+                else
+                    Definitions.displayLargeRatio
+                tv.setTextSize(fontSize * scale)
+                tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                val lp = tv.getLayoutParams() as RelativeLayout.LayoutParams
+                // Don't add to the total anything that overlaps with large
+                if (!entry.value.small && !entry.value.inverse && !entry.value.green && !entry.value.magenta)
+                    totalHeight += tv.getMeasuredHeight() + lp.topMargin + lp.bottomMargin // Include negative margins
+            }
+            // Log.d(Const.TAG, "After font size $fontSize, computed new height $totalHeight compared to desired $pixelHeight")
+            if (validSet) {
+                // Search is done, and we reapplied the last fitting font size
+                Log.d(Const.TAG, "The search for a fitting font is done and applied $fontSize")
+                break
+            } else if (totalHeight < pixelHeight) {
+                validFontSize = fontSize
+                fontSize += 0.5f // Android seems to only implement steps of 0.5
+            } else {
+                // Done with the search, we need to back up one size now and reapply it
+                validSet = true
+                fontSize = validFontSize
+                Log.d(Const.TAG, "Reversing back a fontSize to $fontSize and reapplying")
+            }
+        }
+        Log.d(Const.TAG, "Found fitting font size $validFontSize")
+
+        // Compute a suitable width for each line type (small, large, label)
+        // The step size needs to be small enough otherwise the rows won't all align, 0.02f fails
+        // Need to pick a small enough starting point, because 1.0 on some devices is too wide
+        val scaleStep = 0.01f
+        val scaleInitial = 0.05f
+        var scaleXSmall = scaleInitial
+        var scaleAttempts = 0
+        while (true) {
+            scaleAttempts++
+            terminalTextSmall1.setTextScaleX(scaleXSmall)
+            terminalTextSmall1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            val width = terminalTextSmall1.getMeasuredWidth()
+            // Log.d(Const.TAG, "After X scale $scaleXSmall received width $width for small lines, expecting $pixelWidth")
+            if (width < pixelWidth) {
+                scaleXSmall += scaleStep
+            } else {
+                // Search is done, we exceeded the constraints so revert back one step
+                scaleXSmall -= scaleStep
+                Log.d(Const.TAG, "Found X scale $scaleXSmall for small lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
+                break
+            }
+        }
+        var scaleXLarge = scaleInitial
+        scaleAttempts = 0
+        while (true) {
+            scaleAttempts++
+            terminalTextLarge1.setTextScaleX(scaleXLarge)
+            terminalTextLarge1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            val width = terminalTextLarge1.getMeasuredWidth()
+            // Log.d(Const.TAG, "After X scale $scaleXLarge received width $width for large lines, expecting $pixelWidth")
+            if (width < pixelWidth) {
+                scaleXLarge += scaleStep
+            } else {
+                // Search is done, we exceeded the constraints so revert back one step
+                scaleXLarge -= scaleStep
+                Log.d(Const.TAG, "Found X scale $scaleXLarge for large lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
+                break
+            }
+        }
+        var scaleXLabel = scaleInitial
+        scaleAttempts = 0
+        while (true) {
+            scaleAttempts++
+            terminalLabel1.setTextScaleX(scaleXLabel)
+            terminalLabel1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            val width = terminalLabel1.getMeasuredWidth()
+            // Log.d(Const.TAG, "After X scale $scaleXLabel received width $width for label lines, expecting $pixelWidth")
+            if (width < pixelWidth) {
+                scaleXLabel += scaleStep
+            } else {
+                // Search is done, we exceeded the constraints so revert back one step
+                scaleXLabel -= scaleStep
+                Log.d(Const.TAG, "Found X scale $scaleXLabel for label lines, expecting $pixelWidth from $width, $scaleAttempts attempts")
+                break
+            }
+        }
+
+        // Apply the final text sizes to all lines now
+        Log.d(Const.TAG, "Applying final text sizes to all lines now")
+        for (entry in Definitions.lines) {
+            val tv = entry.value.getTextView(this)
+            if (entry.value.small)      tv.setTextScaleX(scaleXSmall)
+            else if (entry.value.label) tv.setTextScaleX(scaleXLabel)
+            else                        tv.setTextScaleX(scaleXLarge)
+        }
+
+        // Create a transparent overlay to draw key outlines and also any other indicators
+        val bitmapDrawable = cduImage.getDrawable() as BitmapDrawable
+        sourceBitmap = bitmapDrawable.getBitmap()
+        val bitmapNew = Bitmap.createBitmap(sourceBitmap.width, sourceBitmap.height, Bitmap.Config.ARGB_8888)
+        overlayCanvas = Canvas(bitmapNew)
+        Log.d(Const.TAG, "Adding overlay bitmap of size ${bitmapNew.width}x${bitmapNew.height}")
+        cduHelp.setImageBitmap(bitmapNew)
+
+        // Refresh the overlay for the first time
+        refreshOverlay()
     }
 
     companion object {
@@ -378,41 +396,41 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             canvas.drawLine(x1, y2, x1, y1, paint)
         }
 
-        // Illuminate the exec light if active
-        val exec = Definitions.CDUButtonsZibo737["laminar/B738/indicators/fmc_exec_lights"]!!
-        if (exec.illuminate) {
-            val paint = Paint()
-            paint.color = Color.YELLOW
-            paint.style = Paint.Style.FILL
-            overlayCanvas.drawRect(exec.x1.toFloat(), exec.y1.toFloat(), exec.x2.toFloat()+1, exec.y2.toFloat()+1, paint)
-        }
-
-        // We have other lamp indicators where we apply a color booster to make it look illuminated
-        for (lamp in arrayOf("laminar/B738/fmc/fmc_message", "internal_ofst_light", "internal_dspyfail_light")) {
-            val item = Definitions.CDUButtonsZibo737[lamp]!!
-            if (!item.illuminate)
-                continue
-            val paint = Paint()
-            paint.style = Paint.Style.FILL
-
-            if (item.brightBitmap == null) {
-                val partBitmap = Bitmap.createBitmap(item.x2 - item.x1, item.y2 - item.y1, Bitmap.Config.ARGB_8888)
-
-                for (x in item.x1..item.x2 - 1) {
-                    for (y in item.y1..item.y2 - 1) {
-                        var color = sourceBitmap.getPixel(x, y)
-                        if (Color.red(color) < 0x20)
-                            color = Color.BLACK
-                        else
-                            color = Color.YELLOW
-
-                        partBitmap.setPixel(x - item.x1, y - item.y1, color)
-                    }
+        for ((_, item) in Definitions.buttons) {
+            // Illuminate the exec light if active
+            if (item.label == "EXEC") {
+                if (item.illuminate) {
+                    val paint = Paint()
+                    paint.color = Color.YELLOW
+                    paint.style = Paint.Style.FILL
+                    overlayCanvas.drawRect(item.x1.toFloat(), item.y1.toFloat(), item.x2.toFloat()+1, item.y2.toFloat()+1, paint)
                 }
-                item.brightBitmap = partBitmap
-            }
+            } else if (item.label in arrayOf("MSG", "OFST", "DSPYFAIL")) {
+                if (!item.illuminate)
+                    continue
 
-            overlayCanvas.drawBitmap(item.brightBitmap, item.x1.toFloat(), item.y1.toFloat(), paint)
+                val paint = Paint()
+                paint.style = Paint.Style.FILL
+
+                if (item.brightBitmap == null) {
+                    val partBitmap = Bitmap.createBitmap(item.x2 - item.x1, item.y2 - item.y1, Bitmap.Config.ARGB_8888)
+
+                    for (x in item.x1..item.x2 - 1) {
+                        for (y in item.y1..item.y2 - 1) {
+                            var color = sourceBitmap.getPixel(x, y)
+                            if (Color.red(color) < 0x20)
+                                color = Color.BLACK
+                            else
+                                color = Color.YELLOW
+
+                            partBitmap.setPixel(x - item.x1, y - item.y1, color)
+                        }
+                    }
+                    item.brightBitmap = partBitmap
+                }
+
+                overlayCanvas.drawBitmap(item.brightBitmap, item.x1.toFloat(), item.y1.toFloat(), paint)
+            }
         }
 
         // Draw the key outlines if they are active
@@ -422,7 +440,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
             drawBox(overlayCanvas, Definitions.displayXLeft, Definitions.displayYTop, Definitions.displayXRight, Definitions.displayYBottom, paint)
 
-            for (entry in Definitions.CDUButtonsZibo737) {
+            for (entry in Definitions.buttons) {
                 if (entry.value.x1 >= 0) {
                     overlayCanvas.drawText(entry.value.label, entry.value.x1.toFloat() + 3.0f, entry.value.y2.toFloat() - 3.0f, paint)
                     drawBox(overlayCanvas, entry.value.x1.toFloat(), entry.value.y1.toFloat(), entry.value.x2.toFloat(), entry.value.y2.toFloat(), paint)
@@ -445,18 +463,28 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
     }
 
-
-    fun padString24(str: String = "", brackets: Boolean = false): String {
-        val limit = if(brackets) 22 else 24
-        check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
-        if (brackets)
-            return String.format("<%-22s>", str)
-        else
-            return String.format("%-24s", str)
+    private fun setDataref(tcpRef: TCPClient?, dataref: String, value: Float) {
+        // Send the request on a separate thread
+        doBgThread {
+            if ((tcpRef != null) && (tcpRef == tcp_extplane) && connectWorking) {
+                tcpRef.writeln("set $dataref $value")
+            } else {
+                Log.d(Const.TAG, "Ignoring set $dataref $value since TCP connection is not available")
+            }
+        }
     }
 
-    fun centerString24(str: String = "", brackets: Boolean = false): String {
-        val limit = if(brackets) 22 else 24
+    fun padStringCW(str: String = "", brackets: Boolean = false): String {
+        val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
+        check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
+        if (brackets)
+            return String.format("<%-${limit}s>", str)
+        else
+            return String.format("%-${limit}s", str)
+    }
+
+    fun centerStringCW(str: String = "", brackets: Boolean = false): String {
+        val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
         check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
         val spaces = limit - str.length
         val left = spaces / 2
@@ -468,7 +496,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     }
 
     fun resetDisplayDebug() {
-        for (entry in Definitions.CDULinesZibo737) {
+        for (entry in Definitions.lines) {
             val tv = entry.value.getTextView(this)
             if (entry.value.label)        tv.setText("LabelLabelLabelLabelLabe")
             else if (entry.value.small)   tv.setText("S    S    S    S    S   ")
@@ -481,14 +509,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     fun resetDisplay() {
         Log.d(Const.TAG, "resetDisplay()")
-        for (entry in Definitions.CDULinesZibo737) {
+        for (entry in Definitions.lines) {
             val tv = entry.value.getTextView(this)
-            if (entry.value.inverse)      tv.setText(padString24(brackets=false))
-            else if (entry.value.green)   tv.setText(padString24(brackets=false))
-            else if (entry.value.magenta) tv.setText(padString24(brackets=false))
-            else if (entry.value.small)   tv.setText(padString24(brackets=false))
-            else if (entry.value.label)   tv.setText(padString24(brackets=true))
-            else                          tv.setText(padString24(brackets=true))
+            if (entry.value.inverse)      tv.setText(padStringCW(brackets=false))
+            else if (entry.value.green)   tv.setText(padStringCW(brackets=false))
+            else if (entry.value.magenta) tv.setText(padStringCW(brackets=false))
+            else if (entry.value.small)   tv.setText(padStringCW(brackets=false))
+            else if (entry.value.label)   tv.setText(padStringCW(brackets=true))
+            else                          tv.setText(padStringCW(brackets=true))
         }
     }
 
@@ -529,7 +557,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         changeManualHostname(prefAddress)
     }
 
-    private fun setConnectionStatus(line1: String, line2: String, fixup: String, dest: String? = null) {
+    private fun setConnectionStatus(line1: String, line2: String, fixup: String, dest: String? = null, redraw: Boolean = true) {
         Log.d(Const.TAG, "Changing connection status to [$line1][$line2][$fixup] with destination [$dest]")
         var out = line1 + ". "
         if (line2.length > 0)
@@ -543,22 +571,26 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         connectText.text = out
 
-        terminalTextGreen0.setText(centerString24("XPlaneCDU", brackets=true))
-        terminalLabel1.setText(centerString24("For Zibo 738 and XP11", brackets=true))
+        // Do not redraw the CDU if the text area is currently in-use
+        if (redraw) {
+            terminalTextGreen0.setText(centerStringCW("XPlaneCDU", brackets = true))
 
-        terminalLabel2.setText(centerString24(line1, brackets=true))
-        terminalTextLarge2.setText(centerString24(line2, brackets=true))
-        if (connectFailures > 0)
-            terminalLabel3.setText(centerString24("Error #$connectFailures", brackets=true))
-        else
-            terminalLabel3.setText(centerString24("", brackets=true))
-        terminalTextMagenta3.setText(centerString24(fixup, brackets=true))
-        terminalLabel4.setText(centerString24("Tap screws for help", brackets=true))
+            terminalLabel1.setText(centerStringCW("For Zibo738 & SSG748 ", brackets = true))
 
-        terminalLabel5.setText(centerString24("v" + Const.getBuildVersion() + " Build " + Const.getBuildId(), brackets=true))
-        terminalTextLarge5.setText(centerString24(Const.getBuildDateTime(), brackets=true))
+            terminalLabel2.setText(centerStringCW(line1, brackets = true))
+            terminalTextLarge2.setText(centerStringCW(line2, brackets = true))
+            if (connectFailures > 0)
+                terminalLabel3.setText(centerStringCW("Error #$connectFailures", brackets = true))
+            else
+                terminalLabel3.setText(centerStringCW("", brackets = true))
+            terminalTextMagenta3.setText(centerStringCW(fixup, brackets = true))
+            terminalLabel4.setText(centerStringCW("Tap screws for help", brackets = true))
 
-        terminalTextLarge7.setText(centerString24("Tap screen to set IP", brackets=true))
+            terminalLabel5.setText(centerStringCW("v" + Const.getBuildVersion() + " Build " + Const.getBuildId(), brackets = true))
+            terminalTextLarge5.setText(centerStringCW(Const.getBuildDateTime(), brackets = true))
+
+            terminalTextLarge7.setText(centerStringCW("Tap screen to set IP", brackets = true))
+        }
     }
 
     private fun restartNetworking() {
@@ -567,7 +599,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         setConnectionStatus("Closing down network", "", "Wait a few seconds")
         connectAddress = null
         connectWorking = false
-        connectZibo = false
+        connectSupported = false
         connectActTailnum = ""
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
@@ -673,7 +705,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             Log.d(Const.TAG, "Found ExtPlane welcome message, will now make subscription requests for aircraft info")
             setConnectionStatus("Received EXTPLANE", "Sending acf subscribe", "Start your flight", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
-            // Make requests for aircraft type messages so we can detect when the Zibo 738 is available,
+            // Make requests for aircraft type messages so we can detect when a supported aircraft is available,
             // the datarefs do not exist until the aircraft is loaded and in use
             doBgThread {
                 tcpRef.writeln("sub sim/aircraft/view/acf_tailnum")
@@ -681,73 +713,119 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
             if (!connectWorking) {
-                check(!connectZibo) { "connectZibo should not be set if connectWorking is not set" }
+                check(!connectSupported) { "connectSupported should not be set if connectWorking is not set" }
                 // Everything is working with actual data coming back.
                 // This is the last time we can put debug text on the CDU before it is overwritten
                 connectFailures = 0
-                setConnectionStatus("X-Plane CDU starting", "Check aircraft type", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("X-Plane CDU starting", "Check aircraft type", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
             }
 
             val tokens = line.split(" ")
             if (tokens[0] == "ub") {
                 val decoded = String(Base64.decode(tokens[2], Base64.DEFAULT))
-                // Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
-                val fixed = decoded.replace('`','\u00B0').replace('*','\u25CA')
+                // Zibo: Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
+                // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol
+                var fixed = decoded.replace('`','\u00B0').replace('*','\u25CA').replace("[]","\u25CA")
 
-                Log.d(Const.TAG, "Decoded byte array for name [${tokens[1]}] with string [$decoded]")
-                val lineEntry = Definitions.CDULinesZibo737[tokens[1]]
+                // SSG: Contains a bug where it adds a space to the end of a line of hyphens, need to remove that space.
+                // This happens in many places, this is the smallest string that prevents the problem everywhere.
+                fixed = fixed.replace("--------- ", "---------")
+                // SSG: There are 4 extra spaces here which should not be there
+                fixed = fixed.replace("STEP       Opt", "STEP   Opt")
+
+                Log.d(Const.TAG, "Decoded byte array with [$fixed]=${fixed.length} for name [${tokens[1]}]")
+                val lineEntry = Definitions.lines[tokens[1]]
                 if (lineEntry == null) {
-                    // We have received acf_tailnum, so the aircraft has changed, and this will indicate if it is a Zibo-variant aircraft
+                    // We have received a change in acf_tailnum. If we have never seen any aircraft before, then start
+                    // the subscriptions if it is either Zibo or SSG. If we have seen a previous aircraft, then reset
+                    // the network and UI to start fresh.
                     if (tokens[1] == "sim/aircraft/view/acf_tailnum") {
-                        // Has the Zibo-state of the tailnum changed? If we switch from one variant to another, we should not redo the subscriptions
-                        // because it will reset the display while incoming changes are arriving.
-                        if (decoded.toLowerCase().contains("zb73") != connectActTailnum.toLowerCase().contains("zb73")) {
-                            // The aircraft tailnum has actually changed from before
-                            if (decoded.toLowerCase().contains("zb73")) {
-                                setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                        if (connectActTailnum == "") {
+                            // No previous aircraft during this connection
+                            connectActTailnum = decoded
 
-                                // The aircraft has changed to the Zibo 738, so start the subscription process
-                                doBgThread {
-                                    Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is running")
-                                    for (entry in Definitions.CDULinesZibo737) {
-                                        // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
-                                        tcpRef.writeln("sub " + entry.key)
+                            // The aircraft tailnum has actually changed from before
+                            if (decoded.toLowerCase().contains("zb73") || decoded.toLowerCase().contains("ssg002")) {
+                                setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+
+                                // The aircraft has changed to a supported aircraft, so start the subscription process
+                                if (decoded.toLowerCase().contains("zb73")) {
+                                    Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is detected")
+                                    Definitions.setAircraft(Definitions.Aircraft.ZIBO)
+                                } else if (decoded.toLowerCase().contains("ssg002")) {
+                                    Log.d(Const.TAG, "Sending subscriptions for SSG 748 datarefs now that it is detected")
+                                    Definitions.setAircraft(Definitions.Aircraft.SSG)
+                                }
+
+                                // Force the layout to be redone, since the SSG has more columns of text than the Zibo
+                                Log.d(Const.TAG, "Forcing layout to be redone, since the aircraft have different text columns")
+                                changeCduImageColumns(Definitions.numColumns)
+                                resetDisplay() // Set the strings to the default values
+                                layoutCduImage() // Now redo the layout based on the changes
+
+                                // The SSG has some unused CDU lines compared to the Zibo, so clear them out as-if a dataref had arrived to do this
+                                for (entry in Definitions.lines) {
+                                    // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
+                                    if (entry.key.startsWith("--UNUSED--")) {
+                                        // Set the TextView to a blank string because we will never get an update for it
+                                        // Must be done in the UI Thread and not within doBgThread below
+                                        Log.d(Const.TAG, "Clearing out the text for [${entry.value.description}]")
+                                        val view = entry.value.getTextView(this)
+                                        view.text = padStringCW("")
+                                    } else if (entry.key == "SSG/UFMC/LINE_14") {
+                                        // LINE_14 is the text entry area, and is not initialized until one char is entered. Need to clear this just in case.
+                                        Log.d(Const.TAG, "Clearing out the text for possibly uninitialized [${entry.value.description}]")
+                                        val view = entry.value.getTextView(this)
+                                        view.text = padStringCW("")
                                     }
-                                    for (entry in Definitions.CDUButtonsZibo737) {
+                                }
+
+                                doBgThread {
+                                    for (entry in Definitions.lines) {
+                                        // Log.d(Const.TAG, "Requesting CDU text key=" + entry.key + " value=" + entry.value.description)
+                                        if (entry.key.startsWith("--UNUSED--")) {
+                                            // Was handled earlier
+                                        } else {
+                                            tcpRef.writeln("sub " + entry.key)
+                                        }
+                                    }
+                                    for (entry in Definitions.buttons) {
                                         if (entry.value.light) {
                                             Log.d(Const.TAG, "Requesting illuminated status key=" + entry.key + " value=" + entry.value.description)
+                                            tcpRef.writeln("sub " + entry.key)
+                                        } else if (entry.value.dataref) {
+                                            // SSG requires us to listen on a dataref otherwise the set commands later on won't work
+                                            Log.d(Const.TAG, "Requesting button dataref status key=" + entry.key + " value=" + entry.value.description)
                                             tcpRef.writeln("sub " + entry.key)
                                         }
                                     }
                                 }
-                            } else {
-                                // The aircraft changed to something non-Zibo, so reset the CDU and wait for a new aircraft
-                                connectZibo = false
-                                resetDisplay()
-                                setConnectionStatus("Waiting for Zibo 738", "Non-Zibo detected", "Change to Zibo 738", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                             }
-                            connectActTailnum = decoded
                         } else {
-                            Log.d(Const.TAG, "acf_tailnum updated, but no change from previous [$connectActTailnum]")
+                            // Currently handling another aircraft, so reset everything to keep the restart sequence simple
+                            Log.d(Const.TAG, "Detected aircraft change from [$connectActTailnum] to [$decoded], so resetting display and connection")
+                            resetDisplay()
+                            restartNetworking()
                         }
                     } else {
                         Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$fixed]")
                     }
                 } else {
                     val view = lineEntry.getTextView(this)
-                    // Always pad to 24 chars so the terminal is always ready to be re-laid out
-                    view.text = padString24(fixed)
-                    // If this is the first time we found a Zibo CDU dataref, then update the UI, this is the final step!
-                    if (!connectZibo) {
-                        setConnectionStatus("X-Plane CDU working", "", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
-                        connectZibo = true
+                    // Always pad the chars so the terminal is always ready to be re-laid out
+                    view.text = padStringCW(fixed)
+                    // If this is the first time we found a supported CDU dataref, then update the UI, this is the final step
+                    // and we know everything is working. Do not refresh the entire CDU because we already have text on there.
+                    if (!connectSupported) {
+                        setConnectionStatus("X-Plane CDU working", "${connectActTailnum}", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}", redraw = false)
+                        connectSupported = true
                     }
                 }
-            } else if (tokens[0] == "ud") {
+            } else if ((tokens[0] == "ud") || (tokens[0] == "uf")) {
                 val number = tokens[2].toFloat()
-                Log.d(Const.TAG, "Decoded number for name [${tokens[1]}] with value [$number]")
-                val entry = Definitions.CDUButtonsZibo737[tokens[1]]
+                // Log.d(Const.TAG, "Decoded number for name [${tokens[1]}] with value [$number]")
+                val entry = Definitions.buttons[tokens[1]]
                 if (entry == null) {
                     Log.d(Const.TAG, "Found non-CDU result name [${tokens[1]}] with value [$number]")
                 } else {
@@ -755,7 +833,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                         entry.illuminate = (number > 0.5f)
                         refreshOverlay()
                     } else {
-                        Log.d(Const.TAG, "Found non-light name [${tokens[1]}] with value [$number]")
+                        // Log.d(Const.TAG, "Found non-light name [${tokens[1]}] with value [$number]")
                     }
                 }
             } else {
