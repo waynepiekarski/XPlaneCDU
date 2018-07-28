@@ -539,7 +539,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     fun padStringCW(str: String = "", brackets: Boolean = false): String {
         val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
-        check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
+        // TODO: The SSG has a number of bugs that generate +1 or +2 chars more than expected
+        // check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
         if (brackets)
             return String.format("<%-${limit}s>", str)
         else
@@ -796,6 +797,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 fixed = fixed.replace("--------- ", "---------")
                 // SSG: There are 4 extra spaces here which should not be there
                 fixed = fixed.replace("STEP       Opt", "STEP   Opt")
+                // SSG: There is an extra space at the end in all of these
+                fixed = fixed.replace("-----------------DATA LINK ", "-----------------DATA LINK")
+                fixed = fixed.replace("--------------------Preflt ", "--------------------Preflt")
 
                 Log.d(Const.TAG, "Decoded byte array with [$fixed]=${fixed.length} for name [${tokens[1]}]")
                 val lineEntry = Definitions.lines[tokens[1]]
