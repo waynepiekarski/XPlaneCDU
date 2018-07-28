@@ -43,6 +43,8 @@ import android.view.SoundEffectConstants
 import java.net.UnknownHostException
 
 
+
+
 class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnReceiveMulticast {
 
     private var becn_listener: MulticastReceiver? = null
@@ -394,6 +396,67 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             canvas.drawLine(x2, y1, x2, y2, paint)
             canvas.drawLine(x2, y2, x1, y2, paint)
             canvas.drawLine(x1, y2, x1, y1, paint)
+        }
+
+        var fontSize = -1.0f
+        var bounds = Rect()
+        for ((_, item) in Definitions.buttons) {
+            // Draw the label text in if this item has been flagged, otherwise use the text in the image
+            if (item.drawLabel) {
+                val paint = Paint()
+                paint.color = Color.LTGRAY
+                paint.textScaleX = 0.65f // Make the font a bit thinner than usual
+                paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
+                paint.setAntiAlias(true)
+
+                val maxWidth = item.x2 - item.x1
+                val maxHeight = item.y2 - item.y1
+
+                // If this is the first time we're handling a button, compute the font size. We assume all buttons
+                // are the same size, so don't mix and match the sizes!
+                if (fontSize < 0) {
+                    // Compute the font size for a label XXXX XXXX that fits within one of the rectangle buttons
+                    fontSize = 1.0f
+                    val testBounds = Rect()
+                    while (true) {
+                        paint.textSize = fontSize
+                        paint.getTextBounds("XXXX", 0, "XXXX".length, testBounds)
+                        // Check that we can fit two rows of text in with *2.0f
+                        // Also, only use 75% of the max width, and 60% of the max height, do not use the whole button area
+                        if ((bounds.width() < maxWidth * 0.75f) && (bounds.height()*2.0f < maxHeight * 0.6f)) {
+                            fontSize += 0.5f
+                            bounds = testBounds
+                        } else {
+                            break
+                        }
+                    }
+                    // We now have fontSize set to the largest value possible
+                    Log.d(Const.TAG, "Found font size ${fontSize} for CDU key overlay with height ${maxHeight}")
+                }
+                paint.textSize = fontSize
+
+                fun centerText(text: String, x: Float, y: Float, paint: Paint, canvas: Canvas) {
+                    val width = paint.measureText(text)
+                    canvas.drawText(text, x - width/2.0f, y, paint)
+                }
+
+                // Deal with either one or two rows of text, but not more
+                val lines = item.label.split(' ') // Split on spaces or newlines
+
+                val yCenter = (item.y1 + maxHeight/2.0f)
+                // paint.ascent() goes slightly higher than all-caps text, and paint.descent() goes slightly lower.
+                // They are not exactly equal, but combining them gives the best vertical centering I've seen so far.
+                val yHeight = paint.ascent() + paint.descent()
+
+                if (lines.size == 1) {
+                    centerText(lines[0], item.x1 + maxWidth/2.0f, (yCenter - yHeight/2.0f), paint, overlayCanvas)
+                } else if (lines.size == 2) {
+                    centerText(lines[0], item.x1 + maxWidth/2.0f, (yCenter - yHeight/2.0f) + yHeight/1.5f, paint, overlayCanvas)
+                    centerText(lines[1], item.x1 + maxWidth/2.0f, (yCenter - yHeight/2.0f) - yHeight/1.5f, paint, overlayCanvas)
+                } else {
+                    Log.e(Const.TAG, "Found ${lines.size} in string [${item.label}] instead of expected 1 or 2 split on space")
+                }
+            }
         }
 
         for ((_, item) in Definitions.buttons) {

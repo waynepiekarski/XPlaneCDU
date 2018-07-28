@@ -29,7 +29,7 @@ import android.widget.TextView
 
 object Definitions {
 
-    class CDUButton(var description: String, var x1: Int = -1, var y1: Int = -1, var x2: Int = -1, var y2: Int = -1, var label: String, var light: Boolean = false, var dataref: Boolean = false) {
+    class CDUButton(val description: String, val x1: Int = -1, val y1: Int = -1, val x2: Int = -1, val y2: Int = -1, val label: String, val light: Boolean = false, val dataref: Boolean = false, val drawLabel: Boolean = false) {
         var brightBitmap: Bitmap? = null // Used to cache a copy of the area illuminated
         var illuminate: Boolean = false
     }
@@ -42,7 +42,7 @@ object Definitions {
         }
     }
 
-    class CDULine(var description: String, var viewId: Int, var small: Boolean = false, var inverse: Boolean = false, var green: Boolean = false, var magenta: Boolean = false, var label: Boolean = false) {
+    class CDULine(val description: String, private val viewId: Int, val small: Boolean = false, val inverse: Boolean = false, val green: Boolean = false, val magenta: Boolean = false, val label: Boolean = false) {
 
         var cachedView: TextView? = null
 
@@ -144,28 +144,28 @@ object Definitions {
             "laminar/B738/button/fmc1_slash" to CDUButton("FMC captain slash", 494, 1006, 542, 1055, "/"),
             "laminar/B738/button/fmc1_clr"   to CDUButton("FMC captain CLR",   564, 1006, 611, 1055, "CLR"),
 
-            "laminar/B738/button/fmc1_init_ref" to CDUButton("FMC captain INIT REF",  76, 529, 148, 582, "INIT REF"), // Top row
-            "laminar/B738/button/fmc1_rte"      to CDUButton("FMC captain RTE",      164, 529, 235, 582, "RTE"),
-            "laminar/B738/button/fmc1_clb"      to CDUButton("FMC captain CLB",      251, 529, 323, 582, "CLB"),
-            "laminar/B738/button/fmc1_crz"      to CDUButton("FMC captain CRZ",      338, 529, 410, 582, "CRZ"),
-            "laminar/B738/button/fmc1_des"      to CDUButton("FMC captain DES",      425, 529, 497, 582, "DES"),
+            "laminar/B738/button/fmc1_init_ref" to CDUButton("FMC captain INIT REF",  76, 529, 148, 582, "INIT REF", drawLabel=true), // Top row
+            "laminar/B738/button/fmc1_rte"      to CDUButton("FMC captain RTE",      164, 529, 235, 582, "RTE", drawLabel=true),
+            "laminar/B738/button/fmc1_clb"      to CDUButton("FMC captain CLB",      251, 529, 323, 582, "CLB", drawLabel=true),
+            "laminar/B738/button/fmc1_crz"      to CDUButton("FMC captain CRZ",      338, 529, 410, 582, "CRZ", drawLabel=true),
+            "laminar/B738/button/fmc1_des"      to CDUButton("FMC captain DES",      425, 529, 497, 582, "DES", drawLabel=true),
 
-            "laminar/B738/button/fmc1_menu"    to CDUButton("FMC captain MENU",     76, 597, 148, 649, "MENU"), // Second row
-            "laminar/B738/button/fmc1_legs"    to CDUButton("FMC captain LEGS",    164, 597, 235, 649, "LEGS"),
-            "laminar/B738/button/fmc1_dep_app" to CDUButton("FMC captain DEP/ARR", 251, 597, 323, 649, "DEP/ARR"),
-            "laminar/B738/button/fmc1_hold"    to CDUButton("FMC captain HOLD",    338, 597, 410, 649, "HOLD"),
-            "laminar/B738/button/fmc1_prog"    to CDUButton("FMC captain PROG",    425, 597, 497, 649, "PROG"),
-            "laminar/B738/button/fmc1_exec"    to CDUButton("FMC captain EXEC",    540, 611, 609, 649, "EXEC"),
+            "laminar/B738/button/fmc1_menu"    to CDUButton("FMC captain MENU",     76, 597, 148, 649, "MENU", drawLabel=true), // Second row
+            "laminar/B738/button/fmc1_legs"    to CDUButton("FMC captain LEGS",    164, 597, 235, 649, "LEGS", drawLabel=true),
+            "laminar/B738/button/fmc1_dep_app" to CDUButton("FMC captain DEP/ARR", 251, 597, 323, 649, "DEP ARR", drawLabel=true),
+            "laminar/B738/button/fmc1_hold"    to CDUButton("FMC captain HOLD",    338, 597, 410, 649, "HOLD", drawLabel=true),
+            "laminar/B738/button/fmc1_prog"    to CDUButton("FMC captain PROG",    425, 597, 497, 649, "PROG", drawLabel=true),
+            "laminar/B738/button/fmc1_exec"    to CDUButton("FMC captain EXEC",    540, 608, 609, 649, "EXEC", drawLabel=true),
 
             "laminar/B738/indicators/fmc_exec_lights" to CDUButton("EXEC light", 551, 590, 597, 596, "EXEC", light=true),
             "laminar/B738/fmc/fmc_message"            to CDUButton("MSG light",  632, 757, 651, 827, "MSG",  light=true),
             "internal_ofst_light"              to CDUButton("OFST light",        632, 828, 651, 922, "OFST"),
             "internal_dspyfail_light"          to CDUButton("DSPY FAIL light",    30, 757,  48, 921, "DSPYFAIL"),
 
-            "laminar/B738/button/fmc1_n1_lim"    to CDUButton("FMC captain N1 LIMIT",  76, 665, 148, 715,  "N1 LIMIT"),
-            "laminar/B738/button/fmc1_fix"       to CDUButton("FMC captain FIX",       164, 665, 235, 715, "FIX"),
-            "laminar/B738/button/fmc1_prev_page" to CDUButton("FMC captain PREV PAGE", 76, 729, 148, 782,  "PREV PAGE"),
-            "laminar/B738/button/fmc1_next_page" to CDUButton("FMC captain NEXT PAGE", 164, 729, 235, 782, "NEXT PAGE"),
+            "laminar/B738/button/fmc1_n1_lim"    to CDUButton("FMC captain N1 LIMIT",  76, 665, 148, 715,  "N1 LIMIT", drawLabel=true),
+            "laminar/B738/button/fmc1_fix"       to CDUButton("FMC captain FIX",       164, 665, 235, 715, "FIX", drawLabel=true),
+            "laminar/B738/button/fmc1_prev_page" to CDUButton("FMC captain PREV PAGE", 76, 729, 148, 782,  "PREV PAGE", drawLabel=true),
+            "laminar/B738/button/fmc1_next_page" to CDUButton("FMC captain NEXT PAGE", 164, 729, 235, 782, "NEXT PAGE", drawLabel=true),
 
             "laminar/B738/button/fmc1_1"      to CDUButton("FMC captain 1",       68, 798, 121, 852, "1"), // Numeric keypad
             "laminar/B738/button/fmc1_2"      to CDUButton("FMC captain 2",      138, 798, 189, 852, "2"),
@@ -231,30 +231,30 @@ object Definitions {
             "SSG/UFMC/X" to CDUButton("FMC captain X", 494, 937, 542, 987, "X", dataref=true),
             "SSG/UFMC/Y" to CDUButton("FMC captain Y", 564, 937, 611, 987, "Y", dataref=true),
             "SSG/UFMC/Z" to CDUButton("FMC captain Z",     288, 1006, 338, 1055, "Z", dataref=true), // Text row 6
-            "SSG/UFMC/espacio" to CDUButton("FMC captain SPACE", 358, 1006, 407, 1055, " ", dataref=true),
+            "SSG/UFMC/espacio" to CDUButton("FMC captain SPACE", 358, 1006, 407, 1055, " ",   dataref=true),
             "SSG/UFMC/DEL"     to CDUButton("FMC captain DEL",   426, 1006, 475, 1055, "DEL", dataref=true),
-            "SSG/UFMC/barra"   to CDUButton("FMC captain slash", 494, 1006, 542, 1055, "/", dataref=true),
+            "SSG/UFMC/barra"   to CDUButton("FMC captain slash", 494, 1006, 542, 1055, "/",   dataref=true),
             "SSG/UFMC/CLR"     to CDUButton("FMC captain CLR",   564, 1006, 611, 1055, "CLR", dataref=true),
 
-            "SSG/UFMC/INITREF" to CDUButton("FMC captain INIT REF",  76, 529, 148, 582, "INIT REF", dataref=true), // Top row
-            "SSG/UFMC/*rte"    to CDUButton("FMC captain RTE",      164, 529, 235, 582, "N/O RTE", dataref=true), // TODO
-            "SSG/UFMC/*clb"    to CDUButton("FMC captain CLB",      251, 529, 323, 582, "N/O CLB", dataref=true), // TODO
-            "SSG/UFMC/*crz"    to CDUButton("FMC captain CRZ",      338, 529, 410, 582, "N/O CRZ", dataref=true), // TODO
-            "SSG/UFMC/*des"    to CDUButton("FMC captain DES",      425, 529, 497, 582, "N/O DES", dataref=true), // TODO
+            "SSG/UFMC/INITREF" to CDUButton("FMC captain INIT REF",  76, 529, 148, 582, "INIT REF", dataref=true, drawLabel=true), // Top row
+            "SSG/UFMC/RTE"     to CDUButton("FMC captain RTE",      164, 529, 235, 582, "RTE",      dataref=true, drawLabel=true),
+            "SSG/UFMC/DEPARR"  to CDUButton("FMC captain DEP ARR",  251, 529, 323, 582, "DEP ARR",  dataref=true, drawLabel=true),
+            "SSG/UFMC/ATC"     to CDUButton("FMC captain ATC",      338, 529, 410, 582, "ATC",      dataref=true, drawLabel=true),
+            "SSG/UFMC/VNAV"    to CDUButton("FMC captain VNAV",     425, 529, 497, 582, "VNAV",     dataref=true, drawLabel=true),
 
-            "SSG/UFMC/MENU"    to CDUButton("FMC captain MENU",     76, 597, 148, 649, "MENU", dataref=true), // Second row
-            "SSG/UFMC/LEGS"    to CDUButton("FMC captain LEGS",    164, 597, 235, 649, "LEGS", dataref=true),
-            "SSG/UFMC/DEPARR"  to CDUButton("FMC captain DEP/ARR", 251, 597, 323, 649, "DEP/ARR", dataref=true),
-            "SSG/UFMC/HOLD"    to CDUButton("FMC captain HOLD",    338, 597, 410, 649, "HOLD", dataref=true),
-            "SSG/UFMC/PROG"    to CDUButton("FMC captain PROG",    425, 597, 497, 649, "PROG", dataref=true),
-            "SSG/UFMC/EXEC"    to CDUButton("FMC captain EXEC",    540, 611, 609, 649, "EXEC", dataref=true),
+            "SSG/UFMC/FIX"     to CDUButton("FMC captain FIX",       76, 597, 148, 649, "FIX",  dataref=true, drawLabel=true), // Second row
+            "SSG/UFMC/LEGS"    to CDUButton("FMC captain LEGS",     164, 597, 235, 649, "LEGS", dataref=true, drawLabel=true),
+            "SSG/UFMC/HOLD"    to CDUButton("FMC captain HOLD",     251, 597, 323, 649, "HOLD", dataref=true, drawLabel=true),
+            "SSG/UFMC/FMCCOM"  to CDUButton("FMC captain FMC COM",  338, 597, 410, 649, "FMC COMM", dataref=true, drawLabel=true),
+            "SSG/UFMC/PROG"    to CDUButton("FMC captain PROG",     425, 597, 497, 649, "PROG", dataref=true, drawLabel=true),
+            "SSG/UFMC/EXEC"    to CDUButton("FMC captain EXEC",     540, 608, 609, 649, "EXEC", dataref=true, drawLabel=true),
 
             "SSG/UFMC/Exec_Light_on" to CDUButton("EXEC light", 551, 590, 597, 596, "EXEC", light=true),
 
-            "SSG/UFMC/*n1_lim"    to CDUButton("FMC captain N1 LIMIT",  76, 665, 148, 715,  "N/O N1 LIMIT", dataref=true), // TODO
-            "SSG/UFMC/FIX"       to CDUButton("FMC captain FIX",       164, 665, 235, 715, "FIX", dataref=true),
-            "SSG/UFMC/PREVPAGE"  to CDUButton("FMC captain PREV PAGE", 76, 729, 148, 782,  "PREV PAGE", dataref=true),
-            "SSG/UFMC/NEXTPAGE"  to CDUButton("FMC captain NEXT PAGE", 164, 729, 235, 782, "NEXT PAGE", dataref=true),
+            "SSG/UFMC/MENU"      to CDUButton("FMC captain MENU",       76, 665, 148, 715, "MENU",      dataref=true, drawLabel=true),
+            "SSG/UFMC/NAVRAD"    to CDUButton("FMC captain NAV RAD",   164, 665, 235, 715, "NAV RAD",   dataref=true, drawLabel=true),
+            "SSG/UFMC/PREVPAGE"  to CDUButton("FMC captain PREV PAGE",  76, 729, 148, 782, "PREV PAGE", dataref=true, drawLabel=true),
+            "SSG/UFMC/NEXTPAGE"  to CDUButton("FMC captain NEXT PAGE", 164, 729, 235, 782, "NEXT PAGE", dataref=true, drawLabel=true),
 
             "SSG/UFMC/1"      to CDUButton("FMC captain 1",       68,  798, 121,  852, "1", dataref=true), // Numeric keypad
             "SSG/UFMC/2"      to CDUButton("FMC captain 2",      138,  798, 189,  852, "2", dataref=true),
