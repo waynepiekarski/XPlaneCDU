@@ -799,7 +799,7 @@
 \n\nRequirements:
 \n- X-Plane 11
 \n- Download ExtPlane v2 plugin from http://waynepiekarski.net/ExtPlane and unzip into the Resources/Plugins directory
-\n- Zibo's Boeing 738
+\n- Zibo's Boeing 738 or SSG's Boeing 748
 \n- Open TCP port 51000 in Windows firewall for ExtPlane
 \n- Multicast support on your network for auto-detection
 \n

@@ -20,7 +20,7 @@
 //
 // ---------------------------------------------------------------------
 
-XPlaneCDU is a remote control interface for the Control Display Unit (CDU) present in X-Plane 11. This app does not provide an FMS, but simply a way to control the existing CDU from an Android tablet or phone. Currently it works with the Zibo Boeing 737 aircraft.
+XPlaneCDU is a remote control interface for the Control Display Unit (CDU) present in X-Plane 11. This app does not provide an FMS, but simply a way to control the existing CDU from an Android tablet or phone. Currently it works with the Zibo Boeing 738 or SSG 748 aircraft.
 
 You can download the app directly to your Android device from the Google Play store: 
 https://play.google.com/store/apps/details?id=net.waynepiekarski.xplanecdu

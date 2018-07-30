@@ -34,8 +34,8 @@ object Definitions {
         var illuminate: Boolean = false
     }
 
-    // Purge the cached views in CDULinesZibo737 because they are different if the app is re-created
-    // after the back button is pressed. The layout is reinflated but the previous cache is still around.
+    // Purge the cached views because they are different if the app is re-created after the back
+    // button is pressed. The layout is re-inflated but the previous cache is still around.
     fun nullOnCreateCDULines(lines: Map<String, Definitions.CDULine>) {
         for (entry in lines) {
             entry.value.cachedView = null

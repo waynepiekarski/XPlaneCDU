@@ -6,8 +6,7 @@ if [ "$HOSTNAME" == "" ]; then
   exit 1
 fi
 
-# FMC datarefs from the Zibo 737
-REFS="sim/aircraft/view/acf_descrip sim/aircraft/view/acf_author sim/aircraft/view/acf_notes sim/aircraft/view/acf_tailnum sim/aircraft/view/acf_notes"
+REFS="sim/aircraft/view/acf_descrip sim/aircraft/view/acf_author sim/aircraft/view/acf_notes sim/aircraft/view/acf_tailnum"
 
 # Protocol for X-Plane ExtPanel plugin from https://github.com/vranki/ExtPlane
 for each in $REFS; do
