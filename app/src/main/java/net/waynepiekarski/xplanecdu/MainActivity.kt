@@ -328,7 +328,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
 
         fun doBgThread(code: () -> Unit) {
-            Handler(backgroundThread!!.getLooper()).post { code() }
+            // Split up these lines to find an exception that's been observed
+            val looper = backgroundThread!!.getLooper()
+            Handler(looper).post { code() }
         }
     }
 
@@ -693,6 +695,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     override fun onPause() {
         Log.d(Const.TAG, "onPause()")
+        super.onPause()
         connectShutdown = true // Prevent new BECN listeners starting up in restartNetworking
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "onPause(): Cancelling existing TCP connection")
@@ -705,7 +708,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             becn_listener = null
         }
         backgroundThread!!.quit()
-        super.onPause()
+        backgroundThread = null
     }
 
     override fun onDestroy() {
