@@ -539,8 +539,6 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     fun padStringCW(str: String = "", brackets: Boolean = false): String {
         val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
-        // TODO: The SSG has a number of bugs that generate +1 or +2 chars more than expected
-        // check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
         if (brackets)
             return String.format("<%-${limit}s>", str)
         else
@@ -549,8 +547,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
     fun centerStringCW(str: String = "", brackets: Boolean = false): String {
         val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
-        check(str.length <= limit) { "Input string [$str] length ${str.length} exceeds limit $limit" }
-        val spaces = limit - str.length
+        var spaces = limit - str.length
+        if (spaces < 0) // If string is too long, don't center it. acf_tailnum could cause this if too long.
+            spaces = 0
         val left = spaces / 2
         val right = spaces - left
         if (brackets)
