@@ -639,7 +639,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         if (redraw) {
             terminalTextGreen0.setText(centerStringCW("XPlaneCDU", brackets = true))
 
-            terminalLabel1.setText(centerStringCW("For Zibo738 & SSG748 ", brackets = true))
+            terminalLabel1.setText(centerStringCW("For Zibo738 & SSG748", brackets = true))
 
             terminalLabel2.setText(centerStringCW(line1, brackets = true))
             terminalTextLarge2.setText(centerStringCW(line2, brackets = true))
@@ -781,7 +781,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 // Everything is working with actual data coming back.
                 // This is the last time we can put debug text on the CDU before it is overwritten
                 connectFailures = 0
-                setConnectionStatus("X-Plane CDU starting", "Check aircraft type", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("X-Plane CDU starting", "Waiting acf tailnum", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
             }
 
@@ -814,7 +814,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
                             // The aircraft tailnum has actually changed from before
                             if (decoded.toLowerCase().contains("zb73") || decoded.toLowerCase().contains("ssg002")) {
-                                setConnectionStatus("X-Plane CDU starting", "Starting subscription", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                                setConnectionStatus("X-Plane CDU starting", "Subscribe ${connectActTailnum}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
                                 // The aircraft has changed to a supported aircraft, so start the subscription process
                                 if (decoded.toLowerCase().contains("zb73")) {
@@ -868,6 +868,9 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                         }
                                     }
                                 }
+                            } else {
+                                // acf_tailnum contains an aircraft which we don't support
+                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActTailnum}", "Must be ZB73/SSG002", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                             }
                         } else if (connectActTailnum == decoded) {
                             // acf_tailnum was sent to us with the same value. This can happen if a second device connects
