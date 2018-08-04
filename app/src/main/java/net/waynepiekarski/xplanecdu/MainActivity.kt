@@ -95,7 +95,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectFailures = 0
 
         cduImage.setOnTouchListener { _view, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_UP) {
+            if (backgroundThread == null) {
+                // It seems possible for onTouch events to arrive after onPause, but the background
+                // thread is now null, and I've observed null exceptions in doBgThread. So avoid handling
+                // any events here if the app is not running.
+                Log.w(Const.TAG, "onTouch event ignored after onPause()")
+            } else if (motionEvent.action == MotionEvent.ACTION_UP) {
                 // Compute touch location relative to the original image size
                 val ix = ((motionEvent.x * cduImage.getDrawable().intrinsicWidth) / cduImage.width).toInt()
                 val iy = ((motionEvent.y * cduImage.getDrawable().intrinsicHeight) / cduImage.height).toInt()
@@ -328,9 +333,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         }
 
         fun doBgThread(code: () -> Unit) {
-            // Split up these lines to find an exception that's been observed
-            val looper = backgroundThread!!.getLooper()
-            Handler(looper).post { code() }
+            Handler(backgroundThread!!.getLooper()).post { code() }
         }
     }
 
