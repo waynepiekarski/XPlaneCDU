@@ -818,14 +818,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             connectActTailnum = decoded
 
                             // The aircraft tailnum has actually changed from before
-                            if (decoded.toLowerCase().contains("zb73") || decoded.toLowerCase().contains("ssg002")) {
+                            if (decoded.toLowerCase().contains("zb73") || decoded.toLowerCase().contains("ssg00")) {
                                 setConnectionStatus("X-Plane CDU starting", "Subscribe ${connectActTailnum}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
                                 // The aircraft has changed to a supported aircraft, so start the subscription process
                                 if (decoded.toLowerCase().contains("zb73")) {
                                     Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.ZIBO)
-                                } else if (decoded.toLowerCase().contains("ssg002")) {
+                                } else if (decoded.toLowerCase().contains("ssg00")) {
                                     Log.d(Const.TAG, "Sending subscriptions for SSG 748 datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.SSG)
                                 }
@@ -875,7 +875,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 }
                             } else {
                                 // acf_tailnum contains an aircraft which we don't support
-                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActTailnum}", "Must be ZB73/SSG002", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActTailnum}", "Must be ZB73/SSG00", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                             }
                         } else if (connectActTailnum == decoded) {
                             // acf_tailnum was sent to us with the same value. This can happen if a second device connects
