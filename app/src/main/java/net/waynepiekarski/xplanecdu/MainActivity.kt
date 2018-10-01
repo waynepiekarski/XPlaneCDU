@@ -53,7 +53,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var manualAddress: String = ""
     private var manualInetAddress: InetAddress? = null
     private var connectSupported = false
-    private var connectActTailnum: String = ""
+    private var connectActiveDescrip: String = ""
     private var connectWorking = false
     private var connectShutdown = false
     private var connectFailures = 0
@@ -553,7 +553,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     fun centerStringCW(str: String = "", brackets: Boolean = false): String {
         val limit = if(brackets) (Definitions.numColumns-2) else (Definitions.numColumns)
         var spaces = limit - str.length
-        if (spaces < 0) // If string is too long, don't center it. acf_tailnum could cause this if too long.
+        if (spaces < 0) // If string is too long, don't center it. acf_descrip could cause this if too long.
             spaces = 0
         val left = spaces / 2
         val right = spaces - left
@@ -668,7 +668,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectAddress = null
         connectWorking = false
         connectSupported = false
-        connectActTailnum = ""
+        connectActiveDescrip = ""
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
             tcp_extplane!!.stopListener()
@@ -777,7 +777,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             // Make requests for aircraft type messages so we can detect when a supported aircraft is available,
             // the datarefs do not exist until the aircraft is loaded and in use
             doBgThread {
-                tcpRef.writeln("sub sim/aircraft/view/acf_tailnum")
+                tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
             }
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
@@ -786,7 +786,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 // Everything is working with actual data coming back.
                 // This is the last time we can put debug text on the CDU before it is overwritten
                 connectFailures = 0
-                setConnectionStatus("X-Plane CDU starting", "Waiting acf tailnum", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                setConnectionStatus("X-Plane CDU starting", "Waiting acf_descrip", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
             }
 
@@ -809,24 +809,33 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                 Log.d(Const.TAG, "Decoded byte array with [$fixed]=${fixed.length} for name [${tokens[1]}]")
                 val lineEntry = Definitions.lines[tokens[1]]
                 if (lineEntry == null) {
-                    // We have received a change in acf_tailnum. If we have never seen any aircraft before, then start
+                    // We have received a change in acf_descrip. If we have never seen any aircraft before, then start
                     // the subscriptions if it is either Zibo or SSG. If we have seen a previous aircraft, then reset
                     // the network and UI to start fresh.
-                    if (tokens[1] == "sim/aircraft/view/acf_tailnum") {
-                        if (connectActTailnum == "") {
+                    if (tokens[1] == "sim/aircraft/view/acf_descrip") {
+                        if (connectActiveDescrip == "") {
                             // No previous aircraft during this connection
-                            connectActTailnum = decoded
+                            connectActiveDescrip = decoded
 
-                            // The aircraft tailnum has actually changed from before
-                            if (decoded.toLowerCase().contains("zb73") || decoded.toLowerCase().contains("ssg00")) {
-                                setConnectionStatus("X-Plane CDU starting", "Subscribe ${connectActTailnum}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                            // The aircraft description has actually changed from before, look for one of our supported aircraft
+                            // Laminar 737 is "Boeing 737-800" and Laminar 747 is "B747-400" or "747", so need to avoid matching these
+                            val ZIBO738_DESCRIP = "Boeing 737-800X"
+                            val ULTZ739_DESCRIP = "Boeing 737-900UX"
+                            val SSG748I_DESCRIP = "SSG Boeing 748-i"
+                            val SSG748F_DESCRIP = "SSG  Boeing 748 - Freighter" // Two spaces is a typo in the SSG aircraft
+                            if (decoded.contains(ZIBO738_DESCRIP)
+                                || decoded.contains(ULTZ739_DESCRIP)
+                                || decoded.contains(SSG748I_DESCRIP)
+                                || decoded.contains(SSG748F_DESCRIP))
+                            {
+                                setConnectionStatus("X-Plane CDU starting", "Sub: ${connectActiveDescrip}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
                                 // The aircraft has changed to a supported aircraft, so start the subscription process
-                                if (decoded.toLowerCase().contains("zb73")) {
-                                    Log.d(Const.TAG, "Sending subscriptions for Zibo 738 datarefs now that it is detected")
+                                if (decoded.contains(ZIBO738_DESCRIP) || decoded.contains(ULTZ739_DESCRIP)) {
+                                    Log.d(Const.TAG, "Sending subscriptions for Zibo 738 or Ultimate 739 datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.ZIBO)
-                                } else if (decoded.toLowerCase().contains("ssg00")) {
-                                    Log.d(Const.TAG, "Sending subscriptions for SSG 748 datarefs now that it is detected")
+                                } else if (decoded.contains(SSG748I_DESCRIP) || decoded.contains(SSG748F_DESCRIP)) {
+                                    Log.d(Const.TAG, "Sending subscriptions for SSG 748 I/F datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.SSG)
                                 }
 
@@ -874,16 +883,16 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                     }
                                 }
                             } else {
-                                // acf_tailnum contains an aircraft which we don't support
-                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActTailnum}", "Must be ZB73/SSG00", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                                // acf_descrip contains an aircraft which we don't support
+                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActiveDescrip}", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                             }
-                        } else if (connectActTailnum == decoded) {
-                            // acf_tailnum was sent to us with the same value. This can happen if a second device connects
+                        } else if (connectActiveDescrip == decoded) {
+                            // acf_descrip was sent to us with the same value. This can happen if a second device connects
                             // via ExtPlane, and it updates all listeners with the latest value. We can safely ignore this.
-                            Log.d(Const.TAG, "Detected aircraft update which is the same [$connectActTailnum], but ignoring since nothing has changed")
+                            Log.d(Const.TAG, "Detected aircraft update which is the same [$connectActiveDescrip], but ignoring since nothing has changed")
                         } else {
                             // Currently handling another aircraft, so reset everything to keep the restart sequence simple
-                            Log.d(Const.TAG, "Detected aircraft change from [$connectActTailnum] to [$decoded], so resetting display and connection")
+                            Log.d(Const.TAG, "Detected aircraft change from [$connectActiveDescrip] to [$decoded], so resetting display and connection")
                             resetDisplay()
                             restartNetworking()
                         }
@@ -897,7 +906,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     // If this is the first time we found a supported CDU dataref, then update the UI, this is the final step
                     // and we know everything is working. Do not refresh the entire CDU because we already have text on there.
                     if (!connectSupported) {
-                        setConnectionStatus("X-Plane CDU working", "${connectActTailnum}", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}", redraw = false)
+                        setConnectionStatus("X-Plane CDU working", "${connectActiveDescrip}", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}", redraw = false)
                         connectSupported = true
                     }
                 }
