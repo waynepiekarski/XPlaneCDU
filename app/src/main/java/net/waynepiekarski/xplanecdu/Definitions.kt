@@ -98,8 +98,12 @@ object Definitions {
             // Zibo: Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
             fixed = fixed.replace('`', '\u00B0').replace('*', '\u25CA')
         } else if (aircraftType == Aircraft.SSG) {
-            // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol
-            fixed = fixed.replace("[]","\u25CA")
+            // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol, but preserve padding as well
+            fixed = fixed.replace("[][][][] ","\u25CA\u25CA\u25CA\u25CA     ")
+            fixed = fixed.replace("[][][] ",  "\u25CA\u25CA\u25CA    ")
+            fixed = fixed.replace("[][] ",    "\u25CA\u25CA   ")
+            fixed = fixed.replace("[] ",      "\u25CA  ")
+            fixed = fixed.replace("[]",       "\u25CA")
             // SSG: Replace = with degree symbol
             fixed = fixed.replace('=', '\u00B0')
             // SSG: Strip $ symbols, which are some kind of incomplete color encoding
