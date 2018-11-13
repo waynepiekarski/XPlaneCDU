@@ -100,6 +100,10 @@ object Definitions {
         } else if (aircraftType == Aircraft.SSG) {
             // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol
             fixed = fixed.replace("[]","\u25CA")
+            // SSG: Replace = with degree symbol
+            fixed = fixed.replace('=', '\u00B0')
+            // SSG: Strip $ symbols, which are some kind of incomplete color encoding
+            fixed = fixed.replace("$", "")
             // SSG: Contains a bug where it adds a space to the end of a line of hyphens, need to remove that space.
             // This happens in many places, this is the smallest string that prevents the problem everywhere.
             fixed = fixed.replace("--------- ", "---------")
@@ -108,6 +112,8 @@ object Definitions {
             // SSG: There is an extra space at the end in all of these
             fixed = fixed.replace("-----------------DATA LINK ", "-----------------DATA LINK")
             fixed = fixed.replace("--------------------Preflt ", "--------------------Preflt")
+            // SSG: Fix up some color escape sequences to render properly
+            fixed = fixed.replace(";wACTIVATE", "  ACTIVATE")
         } else {
             Log.w(Const.TAG, "Processing decoded string [$decoded] but aircraft type is not known, should not happen")
         }
