@@ -770,7 +770,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         if (tcpRef != tcp_extplane)
             return
 
-        if (line == "EXTPLANE 1") {
+        if (line.startsWith("EXTPLANE 1")) {
             Log.d(Const.TAG, "Found ExtPlane welcome message, will now make subscription requests for aircraft info")
             setConnectionStatus("Received EXTPLANE", "Sending acf subscribe", "Start your flight", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
 
