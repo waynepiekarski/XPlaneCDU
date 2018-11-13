@@ -69,8 +69,9 @@ object Definitions {
 
     // Constants for each aircraft configuration
     enum class Aircraft {
-        ZIBO, SSG
+        ZIBO, SSG, UNKNOWN
     }
+    var aircraftType = Aircraft.UNKNOWN
 
     fun setAircraft(type: Aircraft) {
         assert(Definitions.CDULinesZibo737.count() == Definitions.CDULinesSSG747.count())
@@ -87,6 +88,30 @@ object Definitions {
             lines = CDULinesSSG747
             numColumns = 26
         }
+        aircraftType = type
+    }
+
+    // Each aircraft has different conversions that need to be applied to get the strings ready for display
+    fun cleanAircraftLineStrings(decoded: String) : String {
+        var fixed = decoded
+        if (aircraftType == Aircraft.ZIBO) {
+            // Zibo: Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
+            fixed = fixed.replace('`', '\u00B0').replace('*', '\u25CA')
+        } else if (aircraftType == Aircraft.SSG) {
+            // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol
+            fixed = fixed.replace("[]","\u25CA")
+            // SSG: Contains a bug where it adds a space to the end of a line of hyphens, need to remove that space.
+            // This happens in many places, this is the smallest string that prevents the problem everywhere.
+            fixed = fixed.replace("--------- ", "---------")
+            // SSG: There are 4 extra spaces here which should not be there
+            fixed = fixed.replace("STEP       Opt", "STEP   Opt")
+            // SSG: There is an extra space at the end in all of these
+            fixed = fixed.replace("-----------------DATA LINK ", "-----------------DATA LINK")
+            fixed = fixed.replace("--------------------Preflt ", "--------------------Preflt")
+        } else {
+            Log.w(Const.TAG, "Processing decoded string [$decoded] but aircraft type is not known, should not happen")
+        }
+        return fixed
     }
 
     val CDUButtonsZibo737 = mapOf(

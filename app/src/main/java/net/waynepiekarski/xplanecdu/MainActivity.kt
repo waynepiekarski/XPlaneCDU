@@ -793,20 +793,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             val tokens = line.split(" ")
             if (tokens[0] == "ub") {
                 val decoded = String(Base64.decode(tokens[2], Base64.DEFAULT))
-                // Zibo: Replace ` with degree symbol, and * with a diamond symbol (there is no box in Android fonts)
-                // SSG: Uses "[]" to represent the box character so we need to remap this to a diamond symbol
-                var fixed = decoded.replace('`','\u00B0').replace('*','\u25CA').replace("[]","\u25CA")
 
-                // SSG: Contains a bug where it adds a space to the end of a line of hyphens, need to remove that space.
-                // This happens in many places, this is the smallest string that prevents the problem everywhere.
-                fixed = fixed.replace("--------- ", "---------")
-                // SSG: There are 4 extra spaces here which should not be there
-                fixed = fixed.replace("STEP       Opt", "STEP   Opt")
-                // SSG: There is an extra space at the end in all of these
-                fixed = fixed.replace("-----------------DATA LINK ", "-----------------DATA LINK")
-                fixed = fixed.replace("--------------------Preflt ", "--------------------Preflt")
-
-                Log.d(Const.TAG, "Decoded byte array with [$fixed]=${fixed.length} for name [${tokens[1]}]")
+                Log.d(Const.TAG, "Decoded byte array with [$decoded]=${decoded.length} for name [${tokens[1]}]")
                 val lineEntry = Definitions.lines[tokens[1]]
                 if (lineEntry == null) {
                     // We have received a change in acf_descrip. If we have never seen any aircraft before, then start
@@ -897,10 +885,12 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             restartNetworking()
                         }
                     } else {
-                        Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$fixed]")
+                        Log.d(Const.TAG, "Found unused result name [${tokens[1]}] with string [$decoded]")
                     }
                 } else {
                     val view = lineEntry.getTextView(this)
+                    // This is for a text line entry in the CDU, so clean it up with any specific conversions
+                    val fixed = Definitions.cleanAircraftLineStrings(decoded)
                     // Always pad the chars so the terminal is always ready to be re-laid out
                     view.text = padStringCW(fixed)
                     // If this is the first time we found a supported CDU dataref, then update the UI, this is the final step
