@@ -57,6 +57,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
     private var connectWorking = false
     private var connectShutdown = false
     private var connectFailures = 0
+    private var connectExtplaneVersion = -1
+    private var connectExtplaneWarning = ""
     private lateinit var overlayCanvas: Canvas
     private lateinit var sourceBitmap: Bitmap
     private var overlayOutlines = false
@@ -669,6 +671,8 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         connectWorking = false
         connectSupported = false
         connectActiveDescrip = ""
+        connectExtplaneVersion = -1
+        connectExtplaneWarning = ""
         if (tcp_extplane != null) {
             Log.d(Const.TAG, "Cleaning up any TCP connections")
             tcp_extplane!!.stopListener()
@@ -779,15 +783,39 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
             doBgThread {
                 tcpRef.writeln("sub sim/aircraft/view/acf_descrip")
             }
+        } else if (line.startsWith("EXTPLANE-VERSION ")) {
+            // This is a new header introduced in newer ExtPlane plugins. It will not happen with
+            // older versions, so we cannot require this. We store this version number, and later on
+            // when the datarefs arrive, we should pop up a warning if we detect the plugin is old.
+            // The EXTPLANE-VERSION message is in the header and guaranteed to arrive before connectWorking is true.
+            val tokens = line.split(" ")
+            connectExtplaneVersion = tokens[1].toInt()
+            Log.d(Const.TAG, "Found ExtPlane feature version $connectExtplaneVersion")
+
+            if (connectExtplaneVersion < Const.MIN_EXTPLANE_VERSION) {
+                Log.w(Const.TAG, "EXTPLANE-VERSION detected $connectExtplaneVersion is older than expected ${Const.MIN_EXTPLANE_VERSION}")
+                Toast.makeText(this, "ExtPlane plugin is out of date, requires version ${Const.MIN_EXTPLANE_VERSION} but found $connectExtplaneVersion.\nDownload the latest from http://waynepiekarski.net/ExtPlane", Toast.LENGTH_LONG).show()
+                connectExtplaneWarning = ". Old ExtPlane plugin $connectExtplaneVersion."
+            }
+
+            setConnectionStatus("Received EXTPLANE-VER", "Sending acf subscribe", "Start your flight", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
         } else {
             // Log.d(Const.TAG, "Received TCP line [$line]")
             if (!connectWorking) {
                 check(!connectSupported) { "connectSupported should not be set if connectWorking is not set" }
                 // Everything is working with actual data coming back.
-                // This is the last time we can put debug text on the CDU before it is overwritten
                 connectFailures = 0
-                setConnectionStatus("X-Plane CDU starting", "Waiting acf_descrip", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
                 connectWorking = true
+
+                // If the ExtPlane plugin does not emit EXTPLANE-VERSION, then this is the first opportunity to detect it
+                if (connectExtplaneVersion <= 0) {
+                    Log.w(Const.TAG, "No EXTPLANE-VERSION header detected, so plugin is an unknown old version")
+                    Toast.makeText(this, "ExtPlane plugin is out of date, requires version ${Const.MIN_EXTPLANE_VERSION}.\nDownload the latest from http://waynepiekarski.net/ExtPlane", Toast.LENGTH_LONG).show()
+                    connectExtplaneWarning = ". Old ExtPlane plugin."
+                }
+
+                // This is the last time we can put debug text on the CDU before it is overwritten
+                setConnectionStatus("X-Plane CDU starting", "Waiting acf_descrip", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
             }
 
             val tokens = line.split(" ")
@@ -816,7 +844,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 || decoded.contains(SSG748I_DESCRIP)
                                 || decoded.contains(SSG748F_DESCRIP))
                             {
-                                setConnectionStatus("X-Plane CDU starting", "Sub: ${connectActiveDescrip}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                                setConnectionStatus("X-Plane CDU starting", "Sub: ${connectActiveDescrip}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
 
                                 // The aircraft has changed to a supported aircraft, so start the subscription process
                                 if (decoded.contains(ZIBO738_DESCRIP) || decoded.contains(ULTZ739_DESCRIP)) {
@@ -872,7 +900,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                                 }
                             } else {
                                 // acf_descrip contains an aircraft which we don't support
-                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActiveDescrip}", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}")
+                                setConnectionStatus("X-Plane CDU failed", "Invalid ${connectActiveDescrip}", "Must be Zibo/SSG", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
                             }
                         } else if (connectActiveDescrip == decoded) {
                             // acf_descrip was sent to us with the same value. This can happen if a second device connects
@@ -896,7 +924,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     // If this is the first time we found a supported CDU dataref, then update the UI, this is the final step
                     // and we know everything is working. Do not refresh the entire CDU because we already have text on there.
                     if (!connectSupported) {
-                        setConnectionStatus("X-Plane CDU working", "${connectActiveDescrip}", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}", redraw = false)
+                        setConnectionStatus("X-Plane CDU working", "${connectActiveDescrip}", "", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning", redraw = false)
                         connectSupported = true
                     }
                 }

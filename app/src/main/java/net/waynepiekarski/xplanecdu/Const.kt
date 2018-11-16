@@ -25,6 +25,7 @@ package net.waynepiekarski.xplanecdu
 object Const {
     val TAG = "XPlaneCDU"
     val TCP_EXTPLANE_PORT = 51000
+    val MIN_EXTPLANE_VERSION = 1000 // EXTPLANE-VERSION value should be greater or equal than this to avoid warnings
     val BECN_PORT = 49707
     val BECN_ADDRESS = "239.255.1.1"
     val ERROR_NETWORK_SLEEP: Long = 1000 // Number of msec to wait on network failure
