@@ -836,7 +836,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             // The aircraft description has actually changed from before, look for one of our supported aircraft
                             // Laminar 737 is "Boeing 737-800" and Laminar 747 is "B747-400" or "747", so need to avoid matching these
                             val ZIBO738_DESCRIP = "Boeing 737-800X"
-                            val ULTZ7379_DESCRIP = "Boeing 737-900UX"
+                            val ULTZ7379_DESCRIP = "Boeing 737-900U" // Also matches with 737-900UX
                             val ULTZ7377_DESCRIP = "Boeing 737-700U"
                             val SSG748I_DESCRIP = "SSG Boeing 748-i"
                             val SSG748F_DESCRIP = "SSG  Boeing 748 - Freighter" // Two spaces is a typo in the SSG aircraft
