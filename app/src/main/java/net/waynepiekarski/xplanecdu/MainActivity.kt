@@ -840,11 +840,13 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             val ULTZ7377_DESCRIP = "Boeing 737-700U"
                             val SSG748I_DESCRIP = "SSG Boeing 748-i"
                             val SSG748F_DESCRIP = "SSG  Boeing 748 - Freighter" // Two spaces is a typo in the SSG aircraft
+			    val SSG748V2_DESCRIP = "Boeing 747-8" // SSGv2 presents "Boeing 747-8 Anniversary Edition"
                             if (decoded.contains(ZIBO738_DESCRIP)
                                 || decoded.contains(ULTZ7379_DESCRIP)
                                 || decoded.contains(ULTZ7377_DESCRIP)
                                 || decoded.contains(SSG748I_DESCRIP)
-                                || decoded.contains(SSG748F_DESCRIP))
+                                || decoded.contains(SSG748F_DESCRIP)
+				|| decoded.contains(SSG748V2_DESCRIP))
                             {
                                 setConnectionStatus("X-Plane CDU starting", "Sub: ${connectActiveDescrip}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
 
