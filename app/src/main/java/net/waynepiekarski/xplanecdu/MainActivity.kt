@@ -499,7 +499,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                     item.brightBitmap = partBitmap
                 }
 
-                overlayCanvas.drawBitmap(item.brightBitmap, item.x1.toFloat(), item.y1.toFloat(), paint)
+                overlayCanvas.drawBitmap(item.brightBitmap!!, item.x1.toFloat(), item.y1.toFloat(), paint)
             }
         }
 
@@ -620,7 +620,7 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
 
         // Retrieve the manual address from shared preferences
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
-        val prefAddress = sharedPref.getString("manual_address", "")
+        val prefAddress = sharedPref.getString("manual_address", "").orEmpty()
         Log.d(Const.TAG, "Found preferences value for manual_address = [$prefAddress]")
 
         // Pass on whatever this string is, and will end up calling restartNetworking()
