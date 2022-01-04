@@ -840,21 +840,19 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
                             val ULTZ7377_DESCRIP = "Boeing 737-700U"
                             val SSG748I_DESCRIP = "SSG Boeing 748-i"
                             val SSG748F_DESCRIP = "SSG  Boeing 748 - Freighter" // Two spaces is a typo in the SSG aircraft
-			    val SSG748V2_DESCRIP = "Boeing 747-8" // SSGv2 presents "Boeing 747-8 Anniversary Edition"
-                            if (decoded.contains(ZIBO738_DESCRIP)
-                                || decoded.contains(ULTZ7379_DESCRIP)
-                                || decoded.contains(ULTZ7377_DESCRIP)
-                                || decoded.contains(SSG748I_DESCRIP)
-                                || decoded.contains(SSG748F_DESCRIP)
-				|| decoded.contains(SSG748V2_DESCRIP))
+                            val SSG748V2_DESCRIP = "Boeing 747-8" // SSGv2 presents "Boeing 747-8 Anniversary Edition"
+                            val LEVELUP737_DESCRIP = arrayOf("Boeing 737-600NG", "Boeing 737-700NG", "Boeing 737-800NG", "Boeing 737-900NG", "Boeing 737-900ER") // Match exact names for LevelUp 737NG
+                            val matchZibo = decoded.contains(ZIBO738_DESCRIP) || decoded.contains(ULTZ7379_DESCRIP) || decoded.contains(ULTZ7377_DESCRIP) || LEVELUP737_DESCRIP.contains(decoded)
+                            val matchSSG = decoded.contains(SSG748I_DESCRIP) || decoded.contains(SSG748F_DESCRIP) || decoded.contains(SSG748V2_DESCRIP)
+                            if (matchZibo || matchSSG)
                             {
                                 setConnectionStatus("X-Plane CDU starting", "Sub: ${connectActiveDescrip}", "Check latest plugin", "$connectAddress:${Const.TCP_EXTPLANE_PORT}$connectExtplaneWarning")
 
                                 // The aircraft has changed to a supported aircraft, so start the subscription process
-                                if (decoded.contains(ZIBO738_DESCRIP) || decoded.contains(ULTZ7379_DESCRIP) || decoded.contains(ULTZ7377_DESCRIP)) {
+                                if (matchZibo) {
                                     Log.d(Const.TAG, "Sending subscriptions for Zibo 738 or Ultimate 737-700/900 datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.ZIBO)
-                                } else if (decoded.contains(SSG748I_DESCRIP) || decoded.contains(SSG748F_DESCRIP)) {
+                                } else {
                                     Log.d(Const.TAG, "Sending subscriptions for SSG 748 I/F datarefs now that it is detected")
                                     Definitions.setAircraft(Definitions.Aircraft.SSG)
                                 }
