@@ -73,6 +73,14 @@ class MainActivity : Activity(), TCPClient.OnTCPEvent, MulticastReceiver.OnRecei
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Apply a bundled fixed-pitch font to every CDU text field, instead of relying on the OS
+        // "monospace" font family. Some OEM skins (seen on ColorOS/OPPO, issue #14) rebind that
+        // generic family to whatever proportional font the user picked as their system font,
+        // which breaks the column alignment and width calculations in layoutCduImage().
+        val cduTypeface = Typeface.createFromAsset(assets, "fonts/DroidSansMono.ttf")
+        for (entry in Definitions.lines)
+            entry.value.getTextView(this).typeface = cduTypeface
+
         // It is very important to clear the CDU lines cache. If you don't, then it keeps TextViews
         // around from before the user pressed the back button, but they are no longer valid. When
         // you resume, the memory is still from before, but the layout is re-inflated with new views.

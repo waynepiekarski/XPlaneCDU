@@ -1,0 +1,10 @@
+DroidSansMono.ttf
+
+Source: https://android.googlesource.com/platform/frameworks/base/+/master/data/fonts/DroidSansMono.ttf
+Part of the Android Open Source Project (AOSP).
+Copyright (C) 2007 Google Corporation, digitized data.
+Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
+
+Bundled here as a fallback so the CDU text grid always has a true fixed-pitch
+font available, even on devices where the OS "monospace" font family has been
+overridden with a non-monospaced font (see GitHub issue #14).
